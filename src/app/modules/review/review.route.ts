@@ -10,5 +10,6 @@ router.post(
   validateRequest(ReviewValidation.createReviewZodSchema),
   ReviewController.createReview
 );
+router.get("/", ReviewController.getUserReviews);
 
 export const ReviewRoute = router;

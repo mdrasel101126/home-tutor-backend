@@ -1,12 +1,8 @@
 import { Schema, model } from "mongoose";
-import { IReview } from "./review.interface";
+import { IBooking } from "./booking.interface";
 
-const ReviewSchema = new Schema<IReview>(
+const BookingSchema = new Schema<IBooking>(
   {
-    review: {
-      type: String,
-      required: true,
-    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -29,4 +25,4 @@ const ReviewSchema = new Schema<IReview>(
   return obj;
 }; */
 
-export const Review = model<IReview>("Review", ReviewSchema);
+export const Booking = model<IBooking>("Booking", BookingSchema);

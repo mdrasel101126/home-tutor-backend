@@ -83,15 +83,27 @@ const updateTutor = async (
   id: string,
   payload: Partial<ITutor>
 ): Promise<ITutor | null> => {
-  const isBookExist = await Tutor.isTutorExist(id);
-  if (!isBookExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Tutor not found");
-  }
-  const result = await Tutor.findOneAndUpdate({ _id: id }, payload, {
-    new: true,
-    runValidators: true,
-  });
+  const isExist = await Tutor.findOne({ _id: id });
 
+  if (!isExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Tutor id not found!");
+  }
+
+  const { name, ...userData } = payload;
+
+  const updatedData: Partial<ITutor> = userData;
+
+  if (name && Object.keys(name).length > 0) {
+    Object.keys(name).map((key) => {
+      const nameKey = `name.${key}` as keyof Partial<ITutor>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (updatedData as any)[nameKey] = name[key as keyof typeof name];
+    });
+  }
+
+  const result = await Tutor.findByIdAndUpdate(id, updatedData, {
+    new: true,
+  });
   return result;
 };
 

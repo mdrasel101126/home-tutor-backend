@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Model } from "mongoose";
-export type IUserRole = "seller" | "buyer";
+export type IUserRole = "user" | "admin" | "super_admin";
 type IUserName = {
   firstName: string;
   lastName: string;

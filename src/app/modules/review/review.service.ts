@@ -19,6 +19,12 @@ const createReview = async (payload: IReview): Promise<IReview> => {
   return result;
 };
 
+const getUserReviews = async (id: string): Promise<IReview[]> => {
+  const result = await Review.find({ user: id });
+  return result;
+};
+
 export const ReviewService = {
   createReview,
+  getUserReviews,
 };

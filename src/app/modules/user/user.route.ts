@@ -3,6 +3,7 @@ import validateRequest from "../../middlewares/validateRequest";
 import { UserValidation } from "./user.validation";
 import { UserController } from "./user.controller";
 import auth from "../../middlewares/auth";
+import { ENUM_USER_ROLE } from "../../../enums/user";
 
 const router = Router();
 
@@ -20,7 +21,15 @@ router.get("/", UserController.getAllUsers);
 router.get("/profile", auth(), UserController.getProfile);
 router.get("/:id", UserController.getSingleUser);
 router.patch("/profile", auth(), UserController.updateProfile);
-router.patch("/:id", UserController.updateSingleUser);
-router.delete("/:id", UserController.deleteSingleUser);
+router.patch(
+  "/:id",
+  auth(ENUM_USER_ROLE.SUPPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.updateSingleUser
+);
+router.delete(
+  "/:id",
+  auth(ENUM_USER_ROLE.SUPPER_ADMIN, ENUM_USER_ROLE.ADMIN),
+  UserController.deleteSingleUser
+);
 
 export const UserRoute = router;

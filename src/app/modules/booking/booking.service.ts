@@ -24,12 +24,15 @@ const createBooking = async (payload: IBooking): Promise<IBooking> => {
 };
 
 const getUserBookings = async (id: string): Promise<IBooking[]> => {
-  const result = await Booking.find({ user: id });
+  const result = await Booking.find({ user: id }).populate("tutor");
   return result;
 };
 
 const deleteBooking = async (id: string): Promise<IBooking | null> => {
   const result = await Booking.findOneAndDelete({ _id: id });
+  if (!result) {
+    throw new ApiError(httpStatus.NOT_FOUND, "Booking not found!");
+  }
   return result;
 };
 

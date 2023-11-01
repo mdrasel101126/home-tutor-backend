@@ -24,7 +24,7 @@ const UserSchema = new Schema<IUser, UserModel>(
       required: true,
       unique: true,
     },
-    promfileImg: {
+    profileImg: {
       type: String,
     },
     role: {

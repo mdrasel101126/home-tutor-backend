@@ -1,5 +1,7 @@
 import { Schema, model } from "mongoose";
 import { ITutor, TutorModel } from "./tutor.interface";
+import bcrypt from "bcrypt";
+import config from "../../../config";
 
 const TutorSchema = new Schema<ITutor, TutorModel>(
   {
@@ -13,18 +15,45 @@ const TutorSchema = new Schema<ITutor, TutorModel>(
         required: true,
       },
     },
-    address: {
+    email: {
       type: String,
       required: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: true,
+      select: false,
+    },
+    isAvailable: {
+      type: Boolean,
+      default: true,
     },
     contactNo: {
       type: String,
       required: true,
     },
-    email: {
+    division: {
       type: String,
       required: true,
-      unique: true,
+    },
+    district: {
+      type: String,
+      required: true,
+    },
+    tutionArea: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    role: {
+      type: String,
+      default: "tutor",
+    },
+    sallaryRange: {
+      type: String,
+      required: true,
     },
     description: {
       type: String,
@@ -34,11 +63,23 @@ const TutorSchema = new Schema<ITutor, TutorModel>(
       type: String,
       required: true,
     },
-    preferedClasses: {
+    institutionName: {
       type: String,
       required: true,
     },
-    promfileImg: {
+    preferedClasses: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    preferedSubjects: [
+      {
+        type: String,
+        required: true,
+      },
+    ],
+    profileImg: {
       type: String,
     },
   },
@@ -50,15 +91,43 @@ const TutorSchema = new Schema<ITutor, TutorModel>(
 TutorSchema.statics.isTutorExist = async function (
   id: string
 ): Promise<ITutor | null> {
-  return await Tutor.findOne({ _id: id }).lean();
+  return await Tutor.findById(id).select("+password").lean();
 };
 
-/* BookSchema.methods.toJSON = function () {
+TutorSchema.statics.isPasswordMatched = async function (
+  givenPassword: string,
+  savedPassword: string
+): Promise<boolean> {
+  return await bcrypt.compare(givenPassword, savedPassword);
+};
+
+TutorSchema.pre("save", async function (next) {
+  // password hash
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_round)
+  );
+  next();
+});
+TutorSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate() as Partial<ITutor>;
+  if (update?.password) {
+    update.password = await bcrypt.hash(
+      update.password,
+      Number(config.bcrypt_salt_round)
+    );
+  }
+  next();
+});
+/* UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
+  delete obj.password;
   delete obj.__v;
   delete obj.createdAt;
   delete obj.updatedAt;
   return obj;
-};
- */
+}; */
+
 export const Tutor = model<ITutor, TutorModel>("Tutor", TutorSchema);

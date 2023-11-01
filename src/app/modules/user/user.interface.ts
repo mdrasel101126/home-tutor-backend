@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { Model } from "mongoose";
-export type IUserRole = "user" | "admin" | "super_admin";
+export type IUserRole = "user" | "admin" | "super_admin" | "tutor";
 type IUserName = {
   firstName: string;
   lastName: string;
@@ -8,7 +8,7 @@ type IUserName = {
 export type IUser = {
   name: IUserName;
   email: string;
-  promfileImg?: string;
+  profileImg?: string;
   role?: string;
   contactNo: string;
   address: string;

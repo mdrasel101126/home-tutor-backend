@@ -9,16 +9,21 @@ const router = Router();
 
 router.post(
   "/create-tutor",
-  auth(ENUM_USER_ROLE.SUPPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   validateRequest(TutorValidation.createTutorZodSchema),
   TutorController.createTutor
 );
-//router.patch("/:id";
+router.post(
+  "/login-tutor",
+  validateRequest(TutorValidation.loginTutorZodSchema),
+  TutorController.loginTutor
+);
+router.patch("/profile", auth(), TutorController.updateProfile);
 router.delete(
   "/:id",
   auth(ENUM_USER_ROLE.SUPPER_ADMIN, ENUM_USER_ROLE.ADMIN),
   TutorController.deleteTutor
 );
+router.get("/profile", auth(), TutorController.getProfile);
 router.get("/", TutorController.getTutors);
 router.get("/:id", TutorController.getSingleTutor);
 

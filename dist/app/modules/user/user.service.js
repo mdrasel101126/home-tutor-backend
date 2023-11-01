@@ -39,7 +39,7 @@ const getSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.create(payload);
-    const accessToken = jwt_helpers_1.jwtHelpers.createToken({ email: user.email, _id: user._id }, config_1.default.jwt.sectret, config_1.default.jwt.expires_in);
+    const accessToken = jwt_helpers_1.jwtHelpers.createToken({ email: user.email, _id: user._id, role: user === null || user === void 0 ? void 0 : user.role }, config_1.default.jwt.sectret, config_1.default.jwt.expires_in);
     return { user, accessToken };
 });
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
@@ -52,7 +52,7 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     if (!isPasswordMatched) {
         throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Invalid password!");
     }
-    const accessToken = jwt_helpers_1.jwtHelpers.createToken({ email: user === null || user === void 0 ? void 0 : user.email, _id: user === null || user === void 0 ? void 0 : user._id }, config_1.default.jwt.sectret, config_1.default.jwt.expires_in);
+    const accessToken = jwt_helpers_1.jwtHelpers.createToken({ email: user === null || user === void 0 ? void 0 : user.email, _id: user === null || user === void 0 ? void 0 : user._id, role: user === null || user === void 0 ? void 0 : user.role }, config_1.default.jwt.sectret, config_1.default.jwt.expires_in);
     return { accessToken, user: user };
 });
 const getProfile = (id) => __awaiter(void 0, void 0, void 0, function* () {

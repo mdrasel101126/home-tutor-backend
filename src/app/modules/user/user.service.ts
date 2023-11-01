@@ -18,7 +18,7 @@ const getSingleUser = async (id: string): Promise<IUser | null> => {
 const createUser = async (payload: IUser): Promise<IUserCreateResponse> => {
   const user = await User.create(payload);
   const accessToken = jwtHelpers.createToken(
-    { email: user.email, _id: user._id },
+    { email: user.email, _id: user._id, role: user?.role },
     config.jwt.sectret as Secret,
     config.jwt.expires_in as string
   );
@@ -29,7 +29,7 @@ const loginUser = async (
   payload: Pick<IUser, "email" | "password">
 ): Promise<IUserCreateResponse> => {
   const user = await User.findOne({ email: payload.email }).select("+password");
-  console.log(user);
+  //console.log(user);
   if (!user) {
     throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }
@@ -41,7 +41,7 @@ const loginUser = async (
     throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid password!");
   }
   const accessToken = jwtHelpers.createToken(
-    { email: user?.email, _id: user?._id },
+    { email: user?.email, _id: user?._id, role: user?.role },
     config.jwt.sectret as Secret,
     config.jwt.expires_in as string
   );

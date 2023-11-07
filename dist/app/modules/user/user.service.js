@@ -44,7 +44,7 @@ const createUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.User.findOne({ email: payload.email }).select("+password");
-    console.log(user);
+    //console.log(user);
     if (!user) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "User not found!");
     }
@@ -111,6 +111,10 @@ const deleteSingleUser = (id) => __awaiter(void 0, void 0, void 0, function* () 
     }
     return result;
 });
+const totalUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.User.find().count();
+    return result;
+});
 exports.UserService = {
     createUser,
     loginUser,
@@ -120,4 +124,5 @@ exports.UserService = {
     deleteSingleUser,
     getAllUsers,
     getSingleUser,
+    totalUsers,
 };

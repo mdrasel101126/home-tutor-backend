@@ -14,6 +14,7 @@ const router = (0, express_1.Router)();
 router.post("/create-user", (0, validateRequest_1.default)(user_validation_1.UserValidation.createUserZodSchema), user_controller_1.UserController.createUser);
 router.post("/login-user", (0, validateRequest_1.default)(user_validation_1.UserValidation.loginUserZodSchema), user_controller_1.UserController.loginUser);
 router.get("/", user_controller_1.UserController.getAllUsers);
+router.get("/users-count", user_controller_1.UserController.totalUsers);
 router.get("/profile", (0, auth_1.default)(), user_controller_1.UserController.getProfile);
 router.get("/:id", user_controller_1.UserController.getSingleUser);
 router.patch("/profile", (0, auth_1.default)(), user_controller_1.UserController.updateProfile);

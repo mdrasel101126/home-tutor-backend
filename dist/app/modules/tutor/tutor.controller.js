@@ -29,6 +29,25 @@ const createTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+const loginTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield tutor_sevice_1.TutorService.loginTutor(req.body);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "User log in successfully",
+        data: result,
+    });
+}));
+const getProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const result = yield tutor_sevice_1.TutorService.getProfile((_a = req.user) === null || _a === void 0 ? void 0 : _a._id);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Tutor profile retrived successfully",
+        data: result,
+    });
+}));
 const getTutors = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //console.log(req.query);
     const filters = (0, pick_1.default)(req.query, tutor_constants_1.tutorFilterableFields);
@@ -42,8 +61,8 @@ const getTutors = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void
     });
 }));
 const getSingleTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const result = yield tutor_sevice_1.TutorService.getSingleTutor((_a = req.params) === null || _a === void 0 ? void 0 : _a.id);
+    var _b;
+    const result = yield tutor_sevice_1.TutorService.getSingleTutor((_b = req.params) === null || _b === void 0 ? void 0 : _b.id);
     return (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -52,8 +71,18 @@ const getSingleTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
     });
 }));
 const updateTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const result = yield tutor_sevice_1.TutorService.updateTutor((_b = req.params) === null || _b === void 0 ? void 0 : _b.id, req.body);
+    var _c;
+    const result = yield tutor_sevice_1.TutorService.updateTutor((_c = req.params) === null || _c === void 0 ? void 0 : _c.id, req.body);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Tutor updated successfully",
+        data: result,
+    });
+}));
+const updateProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d;
+    const result = yield tutor_sevice_1.TutorService.updateProfile((_d = req.user) === null || _d === void 0 ? void 0 : _d._id, req.body);
     return (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -62,8 +91,8 @@ const updateTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
     });
 }));
 const deleteTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _c;
-    const result = yield tutor_sevice_1.TutorService.deleteTutor((_c = req.params) === null || _c === void 0 ? void 0 : _c.id);
+    var _e;
+    const result = yield tutor_sevice_1.TutorService.deleteTutor((_e = req.params) === null || _e === void 0 ? void 0 : _e.id);
     return (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -77,4 +106,7 @@ exports.TutorController = {
     getSingleTutor,
     deleteTutor,
     updateTutor,
+    loginTutor,
+    getProfile,
+    updateProfile,
 };

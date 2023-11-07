@@ -18,6 +18,7 @@ router.post(
   UserController.loginUser
 );
 router.get("/", UserController.getAllUsers);
+router.get("/users-count", UserController.totalUsers);
 router.get("/profile", auth(), UserController.getProfile);
 router.get("/:id", UserController.getSingleUser);
 router.patch("/profile", auth(), UserController.updateProfile);

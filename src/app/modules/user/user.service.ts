@@ -124,6 +124,11 @@ const deleteSingleUser = async (id: string): Promise<IUser | null> => {
   return result;
 };
 
+const totalUsers = async (): Promise<number> => {
+  const result = await User.find().count();
+  return result;
+};
+
 export const UserService = {
   createUser,
   loginUser,
@@ -133,4 +138,5 @@ export const UserService = {
   deleteSingleUser,
   getAllUsers,
   getSingleUser,
+  totalUsers,
 };

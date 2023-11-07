@@ -89,6 +89,16 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const totalUsers = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.totalUsers();
+  sendResponse<number>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User updated successfully",
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   loginUser,
@@ -98,4 +108,5 @@ export const UserController = {
   updateProfile,
   getAllUsers,
   getSingleUser,
+  totalUsers,
 };

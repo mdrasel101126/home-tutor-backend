@@ -7,4 +7,5 @@ var ENUM_USER_ROLE;
     ENUM_USER_ROLE["SUPPER_ADMIN"] = "super_admin";
     ENUM_USER_ROLE["ADMIN"] = "admin";
     ENUM_USER_ROLE["USER"] = "user";
+    ENUM_USER_ROLE["TUTOR"] = "tutor";
 })(ENUM_USER_ROLE || (exports.ENUM_USER_ROLE = ENUM_USER_ROLE = {}));

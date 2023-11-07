@@ -30,9 +30,25 @@ const tutor_model_1 = require("./tutor.model");
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const http_status_1 = __importDefault(require("http-status"));
 const review_model_1 = require("../review/review.model");
+const jwt_helpers_1 = require("../../../helpers/jwt.helpers");
+const config_1 = __importDefault(require("../../../config"));
 const createTutor = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield tutor_model_1.Tutor.create(payload);
-    return result;
+    const tutor = yield tutor_model_1.Tutor.create(payload);
+    const accessToken = jwt_helpers_1.jwtHelpers.createToken({ email: tutor.email, _id: tutor._id, role: tutor === null || tutor === void 0 ? void 0 : tutor.role }, config_1.default.jwt.sectret, config_1.default.jwt.expires_in);
+    return { tutor, accessToken };
+});
+const loginTutor = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const tutor = yield tutor_model_1.Tutor.findOne({ email: payload.email }).select("+password");
+    //console.log(user);
+    if (!tutor) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Tutor not found!");
+    }
+    const isPasswordMatched = yield tutor_model_1.Tutor.isPasswordMatched(payload.password, tutor.password);
+    if (!isPasswordMatched) {
+        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, "Invalid password!");
+    }
+    const accessToken = jwt_helpers_1.jwtHelpers.createToken({ email: tutor === null || tutor === void 0 ? void 0 : tutor.email, _id: tutor === null || tutor === void 0 ? void 0 : tutor._id, role: tutor === null || tutor === void 0 ? void 0 : tutor.role }, config_1.default.jwt.sectret, config_1.default.jwt.expires_in);
+    return { accessToken, tutor: tutor };
 });
 const getTutors = (filters, paginationOptions) => __awaiter(void 0, void 0, void 0, function* () {
     const andCoditions = [];
@@ -107,6 +123,32 @@ const updateTutor = (id, payload) => __awaiter(void 0, void 0, void 0, function*
     });
     return result;
 });
+const updateProfile = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const isExist = yield tutor_model_1.Tutor.findOne({ _id: id });
+    if (!isExist) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Tutor id not found!");
+    }
+    const { name } = payload, userData = __rest(payload, ["name"]);
+    const updatedData = userData;
+    if (name && Object.keys(name).length > 0) {
+        Object.keys(name).map((key) => {
+            const nameKey = `name.${key}`;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            updatedData[nameKey] = name[key];
+        });
+    }
+    const result = yield tutor_model_1.Tutor.findByIdAndUpdate(id, updatedData, {
+        new: true,
+    });
+    return result;
+});
+const getProfile = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const isUserExist = yield tutor_model_1.Tutor.isTutorExist(id);
+    if (!isUserExist) {
+        throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Tutor not found");
+    }
+    return isUserExist;
+});
 const deleteTutor = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const isTutorExist = yield tutor_model_1.Tutor.isTutorExist(id);
     if (!isTutorExist) {
@@ -122,4 +164,7 @@ exports.TutorService = {
     getSingleTutor,
     deleteTutor,
     updateTutor,
+    loginTutor,
+    getProfile,
+    updateProfile,
 };

@@ -1,18 +1,19 @@
 /* eslint-disable no-unused-vars */
-import { Model } from "mongoose";
-export type IUserRole = "user" | "admin" | "super_admin" | "tutor";
-type IUserName = {
-  firstName: string;
-  lastName: string;
-};
+import mongoose, { Model, Types } from "mongoose";
+import { ICusomer } from "../customer/customer.interface";
+import { ITutor } from "../tutor/tutor.interface";
+import { IAdmin } from "../admin/admin.interface";
+export type IUserRole = "customer" | "admin" | "super_admin" | "tutor";
+
 export type IUser = {
-  name: IUserName;
+  _id: Types.ObjectId | null;
   email: string;
-  profileImg?: string;
-  role?: string;
-  contactNo: string;
-  address: string;
   password: string;
+  role?: string;
+  profileImg?: string;
+  customer?: Types.ObjectId | ICusomer;
+  tutor?: Types.ObjectId | ITutor;
+  admin?: Types.ObjectId | IAdmin;
 };
 
 export type UserModel = {
@@ -24,8 +25,11 @@ export type UserModel = {
 } & Model<IUser>;
 
 export type IUserCreateResponse = {
-  user: IUser;
+  newUserData?: mongoose.Document<unknown, Record<string, never>, IUser> | null;
   accessToken: string;
+};
+export type IAdminCreateResponse = {
+  newUserData?: mongoose.Document<unknown, Record<string, never>, IUser> | null;
 };
 export type IUserLoginResponse = {
   accessToken: string;

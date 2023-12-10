@@ -71,7 +71,6 @@ const updateTutorZodSchema = zod_1.z.object({
         district: zod_1.z.string().optional(),
         tutionArea: zod_1.z.array(zod_1.z.string()).optional(),
         isAvailable: zod_1.z.boolean().optional(),
-        role: zod_1.z.enum([...user_constants_1.userRole]).optional(),
         description: zod_1.z.string().optional(),
         sallaryRange: zod_1.z.string().optional(),
         educationQualification: zod_1.z.string().optional(),

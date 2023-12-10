@@ -28,8 +28,38 @@ const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
 const user_service_1 = require("./user.service");
-const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserService.createUser(req.body);
+/* const createUser = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.createUser(req.body);
+  return sendResponse<IUserCreateResponse>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User created successfully",
+    data: result,
+  });
+}); */
+const createCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const _a = req.body, { customer } = _a, userData = __rest(_a, ["customer"]);
+    const result = yield user_service_1.UserService.createCustomer(customer, userData);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "User created successfully",
+        data: result,
+    });
+}));
+const createAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const _b = req.body, { admin } = _b, userData = __rest(_b, ["admin"]);
+    const result = yield user_service_1.UserService.createAdmin(admin, userData);
+    return (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "User created successfully",
+        data: result,
+    });
+}));
+const createTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const _c = req.body, { tutor } = _c, userData = __rest(_c, ["tutor"]);
+    const result = yield user_service_1.UserService.createTutor(tutor, userData);
     return (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -56,18 +86,9 @@ const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: result,
     });
 }));
-const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserService.loginUser(req.body);
-    return (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "User log in successfully",
-        data: result,
-    });
-}));
 const getProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const result = yield user_service_1.UserService.getProfile((_a = req.user) === null || _a === void 0 ? void 0 : _a._id);
+    var _d;
+    const result = yield user_service_1.UserService.getProfile((_d = req.user) === null || _d === void 0 ? void 0 : _d._id);
     return (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -75,17 +96,17 @@ const getProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
         data: result,
     });
 }));
-const updateSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const id = req.params.id;
-    const updatedData = __rest(req.body, []);
-    const result = yield user_service_1.UserService.updateSingleUser(id, updatedData);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "User updated successfully",
-        data: result,
-    });
-}));
+/* const updateSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const { ...updatedData } = req.body;
+  const result = await UserService.updateSingleUser(id, updatedData);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User updated successfully",
+    data: result,
+  });
+}); */
 const deleteSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
     const result = yield user_service_1.UserService.deleteSingleUser(id);
@@ -96,18 +117,17 @@ const deleteSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 
         data: result,
     });
 }));
-const updateProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const id = (_b = req.user) === null || _b === void 0 ? void 0 : _b._id;
-    const updatedData = __rest(req.body, []);
-    const result = yield user_service_1.UserService.updateProfile(id, updatedData);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: "User updated successfully",
-        data: result,
-    });
-}));
+/* const updateProfile = catchAsync(async (req: Request, res: Response) => {
+  const id = req.user?._id;
+  const { ...updatedData } = req.body;
+  const result = await UserService.updateProfile(id, updatedData);
+  sendResponse<IUser>(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "User updated successfully",
+    data: result,
+  });
+}); */
 const totalUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_service_1.UserService.totalUsers();
     (0, sendResponse_1.default)(res, {
@@ -118,13 +138,16 @@ const totalUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 exports.UserController = {
-    createUser,
-    loginUser,
+    //createUser,
+    //loginUser,
     getProfile,
-    updateSingleUser,
+    //updateSingleUser,
     deleteSingleUser,
-    updateProfile,
+    //updateProfile,
     getAllUsers,
     getSingleUser,
     totalUsers,
+    createCustomer,
+    createAdmin,
+    createTutor,
 };

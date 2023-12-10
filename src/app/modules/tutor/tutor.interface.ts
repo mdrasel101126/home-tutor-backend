@@ -12,10 +12,10 @@ export type ITutor = {
   email: string;
   password: string;
   isAvailable?: boolean;
-  profileImg?: string;
   contactNo: string;
   division: string;
   district: string;
+  policeStation: string;
   role?: string;
   tutionArea: string[];
   sallaryRange: string;

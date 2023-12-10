@@ -1,7 +1,5 @@
 import { Schema, model } from "mongoose";
 import { ITutor, TutorModel } from "./tutor.interface";
-import bcrypt from "bcrypt";
-import config from "../../../config";
 
 const TutorSchema = new Schema<ITutor, TutorModel>(
   {
@@ -18,12 +16,6 @@ const TutorSchema = new Schema<ITutor, TutorModel>(
     email: {
       type: String,
       required: true,
-      unique: true,
-    },
-    password: {
-      type: String,
-      required: true,
-      select: false,
     },
     isAvailable: {
       type: Boolean,
@@ -38,6 +30,10 @@ const TutorSchema = new Schema<ITutor, TutorModel>(
       required: true,
     },
     district: {
+      type: String,
+      required: true,
+    },
+    policeStation: {
       type: String,
       required: true,
     },
@@ -79,16 +75,13 @@ const TutorSchema = new Schema<ITutor, TutorModel>(
         required: true,
       },
     ],
-    profileImg: {
-      type: String,
-    },
   },
   {
     timestamps: true,
   }
 );
 
-TutorSchema.statics.isTutorExist = async function (
+/* TutorSchema.statics.isTutorExist = async function (
   id: string
 ): Promise<ITutor | null> {
   return await Tutor.findById(id).select("+password").lean();
@@ -120,7 +113,7 @@ TutorSchema.pre("findOneAndUpdate", async function (next) {
     );
   }
   next();
-});
+}); */
 /* UserSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.password;

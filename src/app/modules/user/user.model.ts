@@ -5,40 +5,33 @@ import bcrypt from "bcrypt";
 
 const UserSchema = new Schema<IUser, UserModel>(
   {
-    name: {
-      firstName: {
-        type: String,
-        required: true,
-      },
-      lastName: {
-        type: String,
-        required: true,
-      },
-    },
-    address: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
       unique: true,
     },
-    profileImg: {
-      type: String,
-    },
     role: {
       type: String,
-      default: "user",
-    },
-    contactNo: {
-      type: String,
-      required: true,
     },
     password: {
       type: String,
       required: true,
       select: false,
+    },
+    profileImg: {
+      type: String,
+    },
+    admin: {
+      type: Schema.Types.ObjectId,
+      ref: "Admin",
+    },
+    customer: {
+      type: Schema.Types.ObjectId,
+      ref: "Customer",
+    },
+    tutor: {
+      type: Schema.Types.ObjectId,
+      ref: "Tutor",
     },
   },
   {

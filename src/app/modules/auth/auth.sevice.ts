@@ -1,28 +1,34 @@
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
-import { IUser } from "../user/user.interface";
+import { IUser, IUserCreateResponse } from "../user/user.interface";
 import { User } from "../user/user.model";
-import { ITutor } from "../tutor/tutor.interface";
-import { Tutor } from "../tutor/tutor.model";
+import { jwtHelpers } from "../../../helpers/jwt.helpers";
+import { Secret } from "jsonwebtoken";
+import config from "../../../config";
 
-const getUserProfile = async (id: string): Promise<IUser | null> => {
-  const isUserExist = await User.isUserExist(id);
-  if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+const loginUser = async (
+  payload: Pick<IUser, "email" | "password">
+): Promise<IUserCreateResponse> => {
+  const user = await User.findOne({ email: payload.email }).select("+password");
+  //console.log(user);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
   }
-
-  return isUserExist;
-};
-const getTutorProfile = async (id: string): Promise<ITutor | null> => {
-  const isUserExist = await Tutor.isTutorExist(id);
-  if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "Tutor not found");
+  const isPasswordMatched = await User.isPasswordMatched(
+    payload.password,
+    user.password
+  );
+  if (!isPasswordMatched) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, "Invalid password!");
   }
-
-  return isUserExist;
+  const accessToken = jwtHelpers.createToken(
+    { email: user?.email, _id: user?._id, role: user?.role },
+    config.jwt.sectret as Secret,
+    config.jwt.expires_in as string
+  );
+  return { newUserData: user, accessToken };
 };
 
 export const AuthService = {
-  getUserProfile,
-  getTutorProfile,
+  loginUser,
 };

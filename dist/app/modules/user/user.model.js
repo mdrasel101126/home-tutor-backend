@@ -17,40 +17,33 @@ const mongoose_1 = require("mongoose");
 const config_1 = __importDefault(require("../../../config"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const UserSchema = new mongoose_1.Schema({
-    name: {
-        firstName: {
-            type: String,
-            required: true,
-        },
-        lastName: {
-            type: String,
-            required: true,
-        },
-    },
-    address: {
-        type: String,
-        required: true,
-    },
     email: {
         type: String,
         required: true,
         unique: true,
     },
-    profileImg: {
-        type: String,
-    },
     role: {
         type: String,
-        default: "user",
-    },
-    contactNo: {
-        type: String,
-        required: true,
     },
     password: {
         type: String,
         required: true,
         select: false,
+    },
+    profileImg: {
+        type: String,
+    },
+    admin: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Admin",
+    },
+    customer: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Customer",
+    },
+    tutor: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: "Tutor",
     },
 }, {
     timestamps: true,

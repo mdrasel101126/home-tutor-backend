@@ -80,7 +80,6 @@ const updateTutorZodSchema = z.object({
     district: z.string().optional(),
     tutionArea: z.array(z.string()).optional(),
     isAvailable: z.boolean().optional(),
-    role: z.enum([...userRole] as [string, ...string[]]).optional(),
     description: z.string().optional(),
     sallaryRange: z.string().optional(),
     educationQualification: z.string().optional(),

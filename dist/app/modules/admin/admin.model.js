@@ -33,6 +33,9 @@ const AdminSchema = new mongoose_1.Schema({
         type: String,
         required: true,
     },
+    profileImg: {
+        type: String,
+    },
 }, {
     timestamps: true,
 });

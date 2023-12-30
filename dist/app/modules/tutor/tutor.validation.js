@@ -2,96 +2,125 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TutorValidation = void 0;
 const zod_1 = require("zod");
-const user_constants_1 = require("../user/user.constants");
+const tutor_constant_1 = require("./tutor.constant");
 const createTutorZodSchema = zod_1.z.object({
-    body: zod_1.z.object({
-        name: zod_1.z.object({
-            firstName: zod_1.z.string({
-                required_error: "First names is required",
-            }),
-            lastName: zod_1.z.string({
-                required_error: "Last name is required",
-            }),
-        }, {
-            required_error: "Name is required",
+    body: zod_1.z
+        .object({
+        fullName: zod_1.z.string({
+            required_error: 'fullName is required',
         }),
-        email: zod_1.z.string({
-            required_error: "Email is required",
+        email: zod_1.z
+            .string({
+            required_error: 'email is required',
+        })
+            .email({ message: 'Invalid email format' }),
+        phoneNumber: zod_1.z.string({
+            required_error: 'phoneNumber is required',
         }),
         password: zod_1.z.string({
-            required_error: "Password is required",
+            required_error: 'password is required',
         }),
-        contactNo: zod_1.z.string({
-            required_error: "Contact No is required",
+        gender: zod_1.z.enum([...tutor_constant_1.tutorGender], {
+            required_error: 'gender is required',
         }),
-        division: zod_1.z.string({
-            required_error: "Division is requried",
+        imgUrl: zod_1.z.string().optional(),
+        qualification: zod_1.z.string({
+            required_error: 'qualification is required',
         }),
-        district: zod_1.z.string({
-            required_error: "District is requried",
+        institution: zod_1.z.string({
+            required_error: 'institution is required',
         }),
-        sallaryRange: zod_1.z.string({
-            required_error: "Salary Range is requried",
+        group: zod_1.z.enum([...tutor_constant_1.tutorGroup], {
+            required_error: 'group is required',
         }),
-        tutionArea: zod_1.z.array(zod_1.z.string({
-            required_error: "Tution area is required",
-        })),
-        isAvailable: zod_1.z.boolean().optional(),
-        role: zod_1.z.enum([...user_constants_1.userRole]).optional(),
-        description: zod_1.z.string({
-            required_error: "Description is required",
+        subject: zod_1.z.string({
+            required_error: 'subject is required',
         }),
-        educationQualification: zod_1.z.string({
-            required_error: "Education qualification is required",
+        medium: zod_1.z.enum([...tutor_constant_1.tutorMedium], {
+            required_error: 'medium is required',
         }),
-        institutionName: zod_1.z.string({
-            required_error: "Education name is required",
+        presentAddress: zod_1.z.string({
+            required_error: 'presentAddress is required',
         }),
-        preferedClasses: zod_1.z.array(zod_1.z.string({
-            required_error: "Tution area is required",
-        })),
-        preferedSubjects: zod_1.z.array(zod_1.z.string({
-            required_error: "Tution area is required",
-        })),
-        profileImg: zod_1.z.string().optional(),
-    }),
+        expertIn: zod_1.z.array(zod_1.z.string(), {
+            required_error: 'expertIn are required',
+        }),
+        expectedMinSalary: zod_1.z.number({
+            required_error: 'expectedMinSalary is required',
+        }),
+        dayPerWeek: zod_1.z.number({
+            required_error: 'dayPerWeek is required',
+        }),
+        preferredClass: zod_1.z
+            .enum([...tutor_constant_1.tutorPreferredClass])
+            .optional(),
+        preferredArea: zod_1.z.string({
+            required_error: 'preferredArea is required',
+        }),
+        preferredSubject: zod_1.z.string({
+            required_error: 'preferredSubject is required',
+        }),
+        preferredMedium: zod_1.z.enum([...tutor_constant_1.tutorMedium], {
+            required_error: 'medium is required',
+        }),
+        currentTuition: zod_1.z.number({
+            required_error: 'currentTuition is required',
+        }),
+        maximumTuitionCapacity: zod_1.z.number({
+            required_error: 'maximumTuitionCapacity is required',
+        }),
+        currentStatus: zod_1.z
+            .enum([...tutor_constant_1.tutorCurrentStatus])
+            .optional(),
+    })
+        .strict(),
 });
 const updateTutorZodSchema = zod_1.z.object({
-    body: zod_1.z.object({
-        name: zod_1.z
-            .object({
-            firstName: zod_1.z.string().optional(),
-            lastName: zod_1.z.string().optional(),
-        })
+    body: zod_1.z
+        .object({
+        fullName: zod_1.z.string().optional(),
+        phoneNumber: zod_1.z.string().optional(),
+        gender: zod_1.z.enum([...tutor_constant_1.tutorGender]).optional(),
+        imgUrl: zod_1.z.string().optional(),
+        qualification: zod_1.z.string().optional(),
+        institution: zod_1.z.string().optional(),
+        group: zod_1.z.enum([...tutor_constant_1.tutorGroup]).optional(),
+        subject: zod_1.z.string().optional(),
+        medium: zod_1.z.enum([...tutor_constant_1.tutorMedium]).optional(),
+        presentAddress: zod_1.z.string().optional(),
+        expertIn: zod_1.z.array(zod_1.z.string()).optional(),
+        expectedMinSalary: zod_1.z.number().optional(),
+        dayPerWeek: zod_1.z.number().optional(),
+        preferredClass: zod_1.z
+            .enum([...tutor_constant_1.tutorPreferredClass])
             .optional(),
-        email: zod_1.z.string().optional(),
-        password: zod_1.z.string().optional(),
-        contactNo: zod_1.z.string().optional(),
-        division: zod_1.z.string().optional(),
-        district: zod_1.z.string().optional(),
-        tutionArea: zod_1.z.array(zod_1.z.string()).optional(),
-        isAvailable: zod_1.z.boolean().optional(),
-        description: zod_1.z.string().optional(),
-        sallaryRange: zod_1.z.string().optional(),
-        educationQualification: zod_1.z.string().optional(),
-        institutionName: zod_1.z.string().optional(),
-        preferedClasses: zod_1.z.array(zod_1.z.string()).optional(),
-        preferedSubjects: zod_1.z.array(zod_1.z.string()).optional(),
-        profileImg: zod_1.z.string().optional(),
-    }),
+        preferredArea: zod_1.z.string().optional(),
+        preferredSubject: zod_1.z.string().optional(),
+        preferredMedium: zod_1.z
+            .enum([...tutor_constant_1.tutorMedium])
+            .optional(),
+        currentTuition: zod_1.z.number().optional(),
+        maximumTuitionCapacity: zod_1.z.number().optional(),
+        currentStatus: zod_1.z
+            .enum([...tutor_constant_1.tutorCurrentStatus])
+            .optional(),
+    })
+        .strict(),
 });
-const loginTutorZodSchema = zod_1.z.object({
-    body: zod_1.z.object({
-        email: zod_1.z.string({
-            required_error: "Email is required",
+const reviewTutorZodSchema = zod_1.z.object({
+    body: zod_1.z
+        .object({
+        review: zod_1.z.string({
+            required_error: 'review is required',
         }),
-        password: zod_1.z.string({
-            required_error: "Passsword is required",
+        rating: zod_1.z.number({
+            required_error: 'rating is required',
         }),
-    }),
+    })
+        .strict(),
 });
 exports.TutorValidation = {
     createTutorZodSchema,
     updateTutorZodSchema,
-    loginTutorZodSchema,
+    reviewTutorZodSchema,
 };

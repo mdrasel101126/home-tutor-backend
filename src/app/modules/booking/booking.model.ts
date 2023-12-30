@@ -1,28 +1,57 @@
-import { Schema, model } from "mongoose";
-import { IBooking } from "./booking.interface";
+import { Schema, model } from 'mongoose';
+import { BookingModel, IBooking } from './booking.interface';
+import { statusInfo } from '../tutor/tutor.constant';
 
-const BookingSchema = new Schema<IBooking>(
+const bookingSchema = new Schema<IBooking>(
   {
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
+      required: true,
     },
-    tutor: {
+    tutorId: {
       type: Schema.Types.ObjectId,
-      ref: "Tutor",
+      ref: 'Tutor',
+      required: true,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: statusInfo,
+      default: 'request',
+    },
+    teachingStartDate: {
+      type: Date,
+      required: true,
+    },
+    message: {
+      dayPerWeek: {
+        type: Number,
+        required: true,
+      },
+      teachingTime: {
+        type: String,
+        required: true,
+      },
+      maxSalary: {
+        type: Number,
+        required: true,
+      },
+      location: {
+        type: String,
+        required: true,
+      },
+      description: {
+        type: String,
+        required: true,
+      },
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-/* ReviewSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj.__v;
-  delete obj.createdAt;
-  delete obj.updatedAt;
-  return obj;
-}; */
+const Booking = model<IBooking, BookingModel>('Booking', bookingSchema);
 
-export const Booking = model<IBooking>("Booking", BookingSchema);
+export default Booking;

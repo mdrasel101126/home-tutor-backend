@@ -15,25 +15,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importDefault(require("mongoose"));
 const app_1 = __importDefault(require("./app"));
 const index_1 = __importDefault(require("./config/index"));
-process.on("uncaughtException", (error) => {
+process.on('uncaughtException', error => {
     console.log(error);
     process.exit(1);
 });
 let server;
-function bootstrap() {
+function main() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             yield mongoose_1.default.connect(index_1.default.database_url);
-            console.log("Database connected successfully");
+            console.log(`Database is connected on port ${index_1.default.port}`);
             server = app_1.default.listen(index_1.default.port, () => {
-                console.log(`application listening on port ${index_1.default.port}`);
+                console.log(`Application listening on port ${index_1.default.port}`);
             });
         }
-        catch (err) {
-            console.log("Failed to connect database", err);
+        catch (error) {
+            console.log(`Failed to connect database, ${error}`);
         }
-        process.on("unhandledRejection", (error) => {
-            console.log("Unhandled Rejection is detected,we are closing our server");
+        process.on('unhandledRejection', error => {
             if (server) {
                 server.close(() => {
                     console.log(error);
@@ -46,11 +45,4 @@ function bootstrap() {
         });
     });
 }
-bootstrap();
-//console.log(x)
-process.on("SIGTERM", () => {
-    console.log("SIGTEAM is received");
-    if (server) {
-        server.close();
-    }
-});
+main();

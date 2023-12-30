@@ -10,7 +10,7 @@ const handleValidationError = (err) => {
     const statusCode = 400;
     return {
         statusCode,
-        message: "Validation Error",
+        message: 'Validation error',
         errorMessages: errors,
     };
 };

@@ -5,7 +5,7 @@ const sendResponse = (res, data) => {
         statusCode: data.statusCode,
         success: data.success,
         message: data.message || null,
-        meta: data.meta || null || undefined,
+        meta: data.meta,
         data: data.data || null,
     };
     res.status(data.statusCode).json(responseData);

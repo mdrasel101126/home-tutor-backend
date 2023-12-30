@@ -1,106 +1,227 @@
-import { Request, Response } from "express";
-import catchAsync from "../../../shared/catchAsync";
-import {
-  ISingleTutorResponse,
-  ITutor,
-  ITutorCreateResponse,
-  ITutorLoginResponse,
-} from "./tutor.interface";
-import { TutorService } from "./tutor.sevice";
-import sendResponse from "../../../shared/sendResponse";
-import httpStatus from "http-status";
-import pick from "../../../shared/pick";
-import { tutorFilterableFields } from "./tutor.constants";
-import { paginationFields } from "../../../constants/pagination";
-import { IGenericResponse } from "../../../interfaces/common";
+import { Request, Response, RequestHandler } from 'express';
+import { TutorService } from './tutor.service';
+import catchAsync from '../../../shared/catchAsync';
+import sendResponse from '../../../shared/sendResponse';
+import httpStatus from 'http-status';
+import { ILoginUserResponse } from '../user/user.interface';
+import config from '../../../config';
+import { UserInfoFromToken } from '../../../interfaces/common';
+import pick from '../../../shared/pick';
+import { tutorFilterableField } from './tutor.constant';
+import { paginationFields } from '../../../constant';
 
-const createTutor = catchAsync(async (req: Request, res: Response) => {
-  const result = await TutorService.createTutor(req.body);
-  return sendResponse<ITutorCreateResponse>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "Tutor created successfully",
-    data: result,
-  });
-});
+const createTutor: RequestHandler = catchAsync(
+  async (req: Request, res: Response) => {
+    const result = await TutorService.createTutor(req.body);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      data: result,
+      message: 'Tutor create Successfully',
+    });
+  },
+);
 
 const loginTutor = catchAsync(async (req: Request, res: Response) => {
-  const result = await TutorService.loginTutor(req.body);
-  return sendResponse<ITutorLoginResponse>(res, {
+  const resultWithRefreshToken = await TutorService.loginTutor(req.body);
+  const { refreshToken, ...result } = resultWithRefreshToken;
+
+  const cookieOptions = {
+    secure: config.env === 'production',
+    httpOnly: true,
+  };
+
+  res.cookie('refreshToken', refreshToken, cookieOptions);
+
+  sendResponse<ILoginUserResponse>(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "User log in successfully",
+    message: 'Tutor logged in successfully!',
     data: result,
   });
 });
 
-const getProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await TutorService.getProfile(req.user?._id);
-  return sendResponse<ITutor>(res, {
+const acceptBookingRequest = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+  const tutor = req.user;
+  const result = await TutorService.acceptBookingRequest(
+    tutor as UserInfoFromToken,
+    userId,
+  );
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tutor profile retrived successfully",
+    message: result,
+  });
+});
+
+const cancelBookingRequest = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+  const tutor = req.user;
+  const result = await TutorService.cancelBookingRequest(
+    tutor as UserInfoFromToken,
+    userId,
+  );
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result,
+  });
+});
+
+const ownProfile = catchAsync(async (req: Request, res: Response) => {
+  const userInfo = req?.user;
+
+  const result = await TutorService.ownProfile(userInfo as UserInfoFromToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users retrieved Successfully',
     data: result,
   });
 });
 
-const getTutors = catchAsync(async (req: Request, res: Response) => {
-  //console.log(req.query);
-  const filters = pick(req.query, tutorFilterableFields);
-  const paginationOptions = pick(req.query, paginationFields);
-  const result = await TutorService.getTutors(filters, paginationOptions);
-  return sendResponse<IGenericResponse<ITutor[]>>(res, {
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const userInfo = req?.user;
+
+  const result = await TutorService.changePassword(
+    userInfo as UserInfoFromToken,
+    req.body,
+  );
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tutors retrived successfully",
+    message: 'Password changed Successfully.',
     data: result,
   });
 });
 
 const getSingleTutor = catchAsync(async (req: Request, res: Response) => {
-  const result = await TutorService.getSingleTutor(req.params?.id);
-  return sendResponse<ISingleTutorResponse>(res, {
+  const id = req.params.id;
+
+  const result = await TutorService.getSingleTutor(id);
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tutor retrived successfully",
+    message: 'Tutor retrieved Successfully.',
     data: result,
   });
 });
 
-const updateTutor = catchAsync(async (req: Request, res: Response) => {
-  const result = await TutorService.updateTutor(req.params?.id, req.body);
-  return sendResponse<ITutor>(res, {
+const getSingleTutorByUser = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+
+  const result = await TutorService.getSingleTutorByUser(id);
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tutor updated successfully",
+    message: 'Tutor retrieved Successfully.',
     data: result,
   });
 });
+
+const getAllTutorsByUser = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, tutorFilterableField);
+  const paginationOptions = pick(req.query, paginationFields);
+  const result = await TutorService.getAllTutorsByUser(
+    filters,
+    paginationOptions,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Tutors retrieved Successfully.',
+    data: result,
+  });
+});
+
+const getSingleTutorByAdmin = catchAsync(
+  async (req: Request, res: Response) => {
+    const id = req.params.id;
+
+    const result = await TutorService.getSingleTutorByAdmin(id);
+
+    sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Tutor retrieved Successfully.',
+      data: result,
+    });
+  },
+);
+
+const getAllTutorsByAdmin = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, tutorFilterableField);
+  const paginationOptions = pick(req.query, paginationFields);
+  const result = await TutorService.getAllTutorsByAdmin(
+    filters,
+    paginationOptions,
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Tutors retrieved Successfully.',
+    data: result,
+  });
+});
+
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await TutorService.updateProfile(req.user?._id, req.body);
-  return sendResponse<ITutor>(res, {
+  const id = req.params.id;
+  const tutor = req.body;
+  const userInfo = req.user;
+
+  const result = await TutorService.updateProfile(
+    id,
+    tutor,
+    userInfo as UserInfoFromToken,
+  );
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tutor updated successfully",
+    message: 'Tutor updated successfully',
     data: result,
   });
 });
-const deleteTutor = catchAsync(async (req: Request, res: Response) => {
-  const result = await TutorService.deleteTutor(req.params?.id);
-  return sendResponse<ITutor>(res, {
+
+const reviewTutor = catchAsync(async (req: Request, res: Response) => {
+  const tutorId = req.params.id;
+  const review = req.body;
+  const userInfo = req.user;
+
+  const result = await TutorService.reviewTutor(
+    tutorId,
+    review,
+    userInfo as UserInfoFromToken,
+  );
+
+  sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: "Tutor deleted successfully",
+    message: 'Review post successfully.',
     data: result,
   });
 });
+
 export const TutorController = {
   createTutor,
-  getTutors,
-  getSingleTutor,
-  deleteTutor,
-  updateTutor,
   loginTutor,
-  getProfile,
+  acceptBookingRequest,
+  getSingleTutor,
+  ownProfile,
+  reviewTutor,
+  getSingleTutorByUser,
   updateProfile,
+  getAllTutorsByUser,
+  getSingleTutorByAdmin,
+  getAllTutorsByAdmin,
+  changePassword,
+  cancelBookingRequest,
 };

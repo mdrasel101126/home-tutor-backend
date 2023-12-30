@@ -24,55 +24,72 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
+const user_service_1 = require("./user.service");
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
-const user_service_1 = require("./user.service");
-/* const createUser = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserService.createUser(req.body);
-  return sendResponse<IUserCreateResponse>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "User created successfully",
-    data: result,
-  });
-}); */
-const createCustomer = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const _a = req.body, { customer } = _a, userData = __rest(_a, ["customer"]);
-    const result = yield user_service_1.UserService.createCustomer(customer, userData);
-    return (0, sendResponse_1.default)(res, {
+const config_1 = __importDefault(require("../../../config"));
+const pick_1 = __importDefault(require("../../../shared/pick"));
+const user_constant_1 = require("./user.constant");
+const constant_1 = require("../../../constant");
+const createUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.body;
+    const result = yield user_service_1.UserService.createUser(user);
+    (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "User created successfully",
+        data: result,
+        message: 'User Create Successfully!!!',
+    });
+}));
+const loginUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const resultWithRefreshToken = yield user_service_1.UserService.loginUser(req.body);
+    const { refreshToken } = resultWithRefreshToken, result = __rest(resultWithRefreshToken, ["refreshToken"]);
+    const cookieOptions = {
+        secure: config_1.default.env === 'production',
+        httpOnly: true,
+    };
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'User logged in successfully!',
         data: result,
     });
 }));
-const createAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const _b = req.body, { admin } = _b, userData = __rest(_b, ["admin"]);
-    const result = yield user_service_1.UserService.createAdmin(admin, userData);
-    return (0, sendResponse_1.default)(res, {
+const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { refreshToken } = req.cookies;
+    const result = yield user_service_1.UserService.refreshToken(refreshToken);
+    const cookieOptions = {
+        secure: config_1.default.env === 'production',
+        httpOnly: true,
+    };
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+    (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "User created successfully",
+        message: 'Token retrieve successfully!',
         data: result,
     });
 }));
-const createTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const _c = req.body, { tutor } = _c, userData = __rest(_c, ["tutor"]);
-    const result = yield user_service_1.UserService.createTutor(tutor, userData);
-    return (0, sendResponse_1.default)(res, {
+const ownProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userInfo = req === null || req === void 0 ? void 0 : req.user;
+    const result = yield user_service_1.UserService.ownProfile(userInfo);
+    (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "User created successfully",
+        message: 'Users retrieved Successfully',
         data: result,
     });
 }));
 const getAllUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserService.getAllUsers();
+    const filters = (0, pick_1.default)(req.query, user_constant_1.userFilterableField);
+    const paginationOptions = (0, pick_1.default)(req.query, constant_1.paginationFields);
+    const result = yield user_service_1.UserService.getAllUsers(filters, paginationOptions);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Users retrived successfully",
+        message: 'Users retrieved Successfully',
         data: result,
     });
 }));
@@ -82,72 +99,62 @@ const getSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "User retrived successfully",
+        message: 'User retrieved Successfully',
         data: result,
     });
 }));
-const getProfile = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d;
-    const result = yield user_service_1.UserService.getProfile((_d = req.user) === null || _d === void 0 ? void 0 : _d._id);
-    return (0, sendResponse_1.default)(res, {
+const updateUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userInfo = req.user;
+    const user = req.body;
+    const result = yield user_service_1.UserService.updateUser(user, userInfo);
+    (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "User profile retrived successfully",
+        message: 'User updated Successfully',
         data: result,
     });
 }));
-/* const updateSingleUser = catchAsync(async (req: Request, res: Response) => {
-  const id = req.params.id;
-  const { ...updatedData } = req.body;
-  const result = await UserService.updateSingleUser(id, updatedData);
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "User updated successfully",
-    data: result,
-  });
-}); */
-const deleteSingleUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateUserByAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = req.params.id;
-    const result = yield user_service_1.UserService.deleteSingleUser(id);
+    const user = req.body;
+    const result = yield user_service_1.UserService.updateUserByAdmin(user, id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "User deleted successfully",
+        message: 'User updated Successfully',
         data: result,
     });
 }));
-/* const updateProfile = catchAsync(async (req: Request, res: Response) => {
-  const id = req.user?._id;
-  const { ...updatedData } = req.body;
-  const result = await UserService.updateProfile(id, updatedData);
-  sendResponse<IUser>(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: "User updated successfully",
-    data: result,
-  });
-}); */
-const totalUsers = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_service_1.UserService.totalUsers();
+const changeRole = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const role = req.body;
+    const result = yield user_service_1.UserService.changeRole(role, id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "User updated successfully",
+        message: 'Role updated Successfully',
+        data: result,
+    });
+}));
+const changePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userInfo = req === null || req === void 0 ? void 0 : req.user;
+    const result = yield user_service_1.UserService.changePassword(userInfo, req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'Password changed Successfully.',
         data: result,
     });
 }));
 exports.UserController = {
-    //createUser,
-    //loginUser,
-    getProfile,
-    //updateSingleUser,
-    deleteSingleUser,
-    //updateProfile,
+    createUser,
+    loginUser,
+    refreshToken,
+    ownProfile,
     getAllUsers,
     getSingleUser,
-    totalUsers,
-    createCustomer,
-    createAdmin,
-    createTutor,
+    updateUser,
+    updateUserByAdmin,
+    changeRole,
+    changePassword,
 };

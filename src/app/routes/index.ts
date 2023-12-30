@@ -1,36 +1,30 @@
-import { Router } from "express";
-import { UserRoute } from "../modules/user/user.route";
-import { ReviewRoute } from "../modules/review/review.route";
-import { TutorRoute } from "../modules/tutor/tutor.routes";
-import { BookingRoute } from "../modules/booking/booking.route";
-import { AuthRoute } from "../modules/auth/auth.route";
+import express from 'express';
+import { UserRouters } from '../modules/user/user.route';
+import { TutorRouters } from '../modules/tutor/tutor.route';
+import { BookingRouters } from '../modules/booking/booking.route';
+import { FeedbackRouters } from '../modules/feedback/feedback.route';
 
-const router = Router();
+const router = express.Router();
 
 const moduleRoutes = [
   {
-    path: "/users",
-    route: UserRoute,
+    path: '/user',
+    route: UserRouters,
   },
   {
-    path: "/tutors",
-    route: TutorRoute,
+    path: '/tutor',
+    route: TutorRouters,
   },
   {
-    path: "/reviews",
-    route: ReviewRoute,
+    path: '/booking',
+    route: BookingRouters,
   },
   {
-    path: "/bookings",
-    route: BookingRoute,
-  },
-  {
-    path: "/auth",
-    route: AuthRoute,
+    path: '/feedback',
+    route: FeedbackRouters,
   },
 ];
-moduleRoutes.map((moduleRoute) =>
-  router.use(moduleRoute.path, moduleRoute.route)
-);
 
-export default router;
+moduleRoutes.forEach(route => router.use(route.path, route.route));
+
+export const ApplicationRouters = router;

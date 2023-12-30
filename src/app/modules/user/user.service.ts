@@ -1,247 +1,288 @@
-import { Secret } from "jsonwebtoken";
-import config from "../../../config";
-import { jwtHelpers } from "../../../helpers/jwt.helpers";
+import httpStatus from 'http-status';
+import ApiError from '../../../errors/ApiError';
 import {
-  IAdminCreateResponse,
+  IChangePassword,
+  ILoginRequest,
+  ILoginUserResponse,
   IUser,
-  IUserCreateResponse,
-} from "./user.interface";
-import { User } from "./user.model";
-import ApiError from "../../../errors/ApiError";
-import httpStatus from "http-status";
-import { ICusomer } from "../customer/customer.interface";
-import mongoose from "mongoose";
-import { Customer } from "../customer/customer.model";
-import { Admin } from "../admin/admin.model";
-import { IAdmin } from "../admin/admin.interface";
-import { ITutor } from "../tutor/tutor.interface";
-import { Tutor } from "../tutor/tutor.model";
+} from './user.interface';
+import User from './user.model';
+import { jwtHelpers } from '../../../helpers/jwtHelpers';
+import config from '../../../config';
+import { Secret } from 'jsonwebtoken';
+import Tutor from '../tutor/tutor.model';
+import {
+  IGenericResponse,
+  IPaginationOptions,
+  UserInfoFromToken,
+} from '../../../interfaces/common';
+import { userFilterableField } from './user.constant';
+import { calculatePagination } from '../../../helpers/paginationHelper';
+import { SortOrder } from 'mongoose';
 
-const getAllUsers = async (): Promise<IUser[]> => {
-  const result = await User.find({});
+const createUser = async (user: IUser): Promise<IUser | null> => {
+  const checkNumber = await User.findOne({ phoneNumber: user.phoneNumber });
+  const checkEmail = await User.findOne({ email: user.email });
+
+  if (checkEmail) {
+    throw new ApiError(httpStatus.CONFLICT, 'Already used this email!!!');
+  }
+  if (checkNumber) {
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      'Already used this phone number!!!',
+    );
+  }
+  const createdUser = await User.create(user);
+  if (!createdUser) {
+    throw new ApiError(400, 'Failed to create user!');
+  }
+  const result = await User.findById(createdUser._id);
   return result;
 };
-const getSingleUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findOne({ _id: id });
-  return result;
-};
 
-/* const createUser = async (payload: IUser): Promise<IUserCreateResponse> => {
-  const user = await User.create(payload);
-  const accessToken = jwtHelpers.createToken(
-    { email: user.email, _id: user._id, role: user?.role },
-    config.jwt.sectret as Secret,
-    config.jwt.expires_in as string
-  );
-  return { user, accessToken };
-}; */
-const createCustomer = async (
-  customer: ICusomer,
-  user: IUser
-): Promise<IUserCreateResponse | null> => {
-  user.role = "customer";
-  let newUserData = null;
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction();
-    const newCustomer = await Customer.create([customer], { session });
-    if (!newCustomer.length) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create Customer");
-    }
-    user.customer = newCustomer[0]._id;
-    const newUser = await User.create([user], { session });
-    if (!newUser.length) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create user");
-    }
-    newUserData = newUser[0];
-    await session.commitTransaction();
-    await session.endSession();
-  } catch (error) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw error;
-  }
-  if (newUserData) {
-    newUserData = await User.findById(newUserData._id).populate("customer");
-  }
-  const accessToken = jwtHelpers.createToken(
-    {
-      email: newUserData?.email,
-      _id: newUserData?._id,
-      role: newUserData?.role,
-    },
-    config.jwt.sectret as Secret,
-    config.jwt.expires_in as string
-  );
-  return { newUserData, accessToken };
-};
+const loginUser = async (
+  payload: ILoginRequest,
+): Promise<ILoginUserResponse> => {
+  const { email, password } = payload;
 
-const createAdmin = async (
-  admin: IAdmin,
-  user: IUser
-): Promise<IAdminCreateResponse | null> => {
-  user.role = "admin";
-  let newUserData = null;
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction();
-    const newAdmin = await Admin.create([admin], { session });
-    if (!newAdmin.length) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create admin");
-    }
-    user.admin = newAdmin[0]._id;
-    const newUser = await User.create([user], { session });
-    if (!newUser.length) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create user");
-    }
-    newUserData = newUser[0];
-    await session.commitTransaction();
-    await session.endSession();
-  } catch (error) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw error;
-  }
-  if (newUserData) {
-    newUserData = await User.findById(newUserData._id).populate("admin");
-  }
+  const isUserExist = await User.isUserExist(email);
 
-  return { newUserData };
-};
-const createTutor = async (
-  tutor: ITutor,
-  user: IUser
-): Promise<IUserCreateResponse | null> => {
-  user.role = "tutor";
-  let newUserData = null;
-  //console.log({ tutor, user });
-  const session = await mongoose.startSession();
-  try {
-    session.startTransaction();
-    const newTutor = await Tutor.create([tutor], { session });
-    if (!newTutor.length) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create tutor");
-    }
-    user.tutor = newTutor[0]._id;
-    const newUser = await User.create([user], { session });
-    if (!newUser.length) {
-      throw new ApiError(httpStatus.BAD_REQUEST, "Failed to create user");
-    }
-    newUserData = newUser[0];
-    await session.commitTransaction();
-    await session.endSession();
-  } catch (error) {
-    await session.abortTransaction();
-    await session.endSession();
-    throw error;
-  }
-  if (newUserData) {
-    newUserData = await User.findById(newUserData._id).populate("tutor");
-  }
-  const accessToken = jwtHelpers.createToken(
-    {
-      email: newUserData?.email,
-      _id: newUserData?._id,
-      role: newUserData?.role,
-    },
-    config.jwt.sectret as Secret,
-    config.jwt.expires_in as string
-  );
-  return { newUserData, accessToken };
-};
-
-const getProfile = async (id: string): Promise<IUser | null> => {
-  const isUserExist = await User.isUserExist(id);
   if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found");
+    throw new ApiError(httpStatus.NOT_FOUND, "User doesn't exist.");
   }
 
-  return isUserExist;
+  if (!(await User.isPasswordMatch(password, isUserExist.password))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect.');
+  }
+
+  const { role, id } = isUserExist;
+
+  const accessToken = jwtHelpers.createToken(
+    { id, email, role },
+    config.jwt.secret as Secret,
+    config.jwt.expires_in as string,
+  );
+
+  const refreshToken = jwtHelpers.createToken(
+    { id, email, role },
+    config.jwt.refresh_secret as Secret,
+    config.jwt.refresh_expires_in as string,
+  );
+
+  return {
+    accessToken,
+    refreshToken,
+  };
 };
 
-/* const updateSingleUser = async (
-  id: string,
-  payload: Partial<IUser>
-): Promise<IUser | null> => {
-  const isExist = await User.findOne({ _id: id });
+const refreshToken = async (
+  refreshToken: string,
+): Promise<{ accessToken: string }> => {
+  let verifiedToken;
 
-  if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User id not found!");
+  try {
+    verifiedToken = jwtHelpers.verifyToken(
+      refreshToken,
+      config.jwt.refresh_secret as Secret,
+    );
+  } catch (error) {
+    throw new ApiError(httpStatus.FORBIDDEN, 'Invalid refresh token!!!');
   }
+  const isUserExist = await User.isUserExist(verifiedToken.email);
+  const isTutorExist = await Tutor.isUserExist(verifiedToken.email);
 
-  const { name, ...userData } = payload;
-
-  const updatedData: Partial<IUser> = userData;
-
-  if (name && Object.keys(name).length > 0) {
-    Object.keys(name).map((key) => {
-      const nameKey = `name.${key}` as keyof Partial<IUser>;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (updatedData as any)[nameKey] = name[key as keyof typeof name];
-    });
+  if (!isUserExist && !isTutorExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User doesn't exist!!!");
   }
+  const newAccessToken = jwtHelpers.createToken(
+    verifiedToken.role === 'tutor'
+      ? {
+          id: isTutorExist.id,
+          email: isTutorExist.email,
+          role: isTutorExist.role,
+        }
+      : {
+          id: isUserExist.id,
+          email: isUserExist.email,
+          role: isUserExist.role,
+        },
+    config.jwt.secret as Secret,
+    config.jwt.expires_in as string,
+  );
 
-  const result = await User.findByIdAndUpdate(id, updatedData, {
-    new: true,
-  });
-  return result;
+  return {
+    accessToken: newAccessToken,
+  };
 };
- */
-/* const updateProfile = async (
-  id: string,
-  payload: Partial<IUser>
+
+const ownProfile = async (
+  userInfo: UserInfoFromToken,
 ): Promise<IUser | null> => {
-  const { name, ...userData } = payload;
-
-  if (userData.role) {
-    throw new ApiError(httpStatus.BAD_REQUEST, "User role can not be changed!");
-  }
-  const isExist = await User.findOne({ _id: id });
-  if (!isExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User id not found!");
-  }
-
-  const updatedData: Partial<IUser> = userData;
-
-  if (name && Object.keys(name).length > 0) {
-    Object.keys(name).map((key) => {
-      const nameKey = `name.${key}` as keyof Partial<IUser>;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (updatedData as any)[nameKey] = name[key as keyof typeof name];
-    });
-  }
-
-  const result = await User.findOneAndUpdate({ _id: id }, updatedData, {
-    new: true,
-    runValidators: true,
-  });
-  return result;
-}; */
-
-const deleteSingleUser = async (id: string): Promise<IUser | null> => {
-  const result = await User.findByIdAndDelete(id);
+  const result = await User.findById(userInfo.id);
   if (!result) {
-    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+    throw new ApiError(httpStatus.CONFLICT, 'Your profile is not exist!!!');
   }
   return result;
 };
+export type IUserFilters = {
+  searchTerm?: string;
+  lowestExpectedSalary?: number;
+  highestExpectedSalary?: number;
+};
 
-const totalUsers = async (): Promise<number> => {
-  const result = await User.find().count();
+const getAllUsers = async (
+  filters: IUserFilters,
+  paginationOptions: IPaginationOptions,
+): Promise<IGenericResponse<IUser[]>> => {
+  const { searchTerm, ...filtersData } = filters;
+
+  const andConditions = [];
+
+  // for filter data
+  if (searchTerm) {
+    andConditions.push({
+      $or: userFilterableField.map(field => ({
+        [field]: { $regex: searchTerm, $options: 'i' },
+      })),
+    });
+  }
+
+  // for exact match user and condition
+  if (Object.keys(filtersData).length) {
+    andConditions.push({
+      $and: Object.entries(filtersData).map(([field, value]) => ({
+        [field]: value,
+      })),
+    });
+  }
+
+  const { page, limit, skip, sortBy, sortOrder } =
+    calculatePagination(paginationOptions);
+
+  const sortConditions: { [key: string]: SortOrder } = {};
+
+  if (sortBy && sortOrder) {
+    sortConditions[sortBy] = sortOrder;
+  }
+
+  // if no condition is given
+  const query = andConditions.length > 0 ? { $and: andConditions } : {};
+
+  const result = await User.find(query)
+    .sort(sortConditions)
+    .skip(skip)
+    .limit(limit)
+    .select({
+      unseenNotification: false,
+    });
+
+  const count = await User.countDocuments(query);
+
+  return {
+    meta: {
+      page,
+      limit,
+      count,
+    },
+    data: result,
+  };
+};
+
+const getSingleUser = async (id: string): Promise<IUser | null> => {
+  const result = await User.findById(id);
   return result;
 };
 
+const updateUser = async (
+  payload: Partial<IUser>,
+  userInfo: UserInfoFromToken,
+): Promise<IUser | null> => {
+  const isUserExist = await User.findById(userInfo.id);
+
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+  if (payload.phoneNumber) {
+    const checkNumber = await User.findOne({
+      phoneNumber: payload.phoneNumber,
+    });
+    if (checkNumber) {
+      throw new ApiError(httpStatus.CONFLICT, 'Already used this number!!!');
+    }
+  }
+  const result = await User.findOneAndUpdate({ _id: userInfo.id }, payload, {
+    new: true,
+  });
+  return result;
+};
+
+const updateUserByAdmin = async (
+  payload: Partial<IUser>,
+  id: string,
+): Promise<IUser | null> => {
+  const isUserExist = await User.findById(id);
+
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+  if (payload.phoneNumber) {
+    const checkNumber = await User.findOne({
+      phoneNumber: payload.phoneNumber,
+    });
+    if (checkNumber) {
+      throw new ApiError(httpStatus.CONFLICT, 'Already used this number!!!');
+    }
+  }
+  const result = await User.findOneAndUpdate({ _id: id }, payload, {
+    new: true,
+  });
+  return result;
+};
+
+const changeRole = async (
+  payload: Partial<IUser>,
+  id: string,
+): Promise<IUser | null> => {
+  const isUserExist = await User.findById(id);
+
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+  const result = await User.findOneAndUpdate({ _id: id }, payload, {
+    new: true,
+  });
+  return result;
+};
+
+const changePassword = async (
+  userInfo: UserInfoFromToken,
+  payload: IChangePassword,
+): Promise<void> => {
+  const { oldPassword, newPassword } = payload;
+  const isUserExist = await User.findById(userInfo.id).select({
+    password: true,
+  });
+
+  if (!isUserExist) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+  }
+
+  if (!(await User.isPasswordMatch(oldPassword, isUserExist.password))) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Old Password is incorrect');
+  }
+  isUserExist.password = newPassword;
+  isUserExist.save();
+};
 export const UserService = {
-  //createUser,
-  //loginUser,
-  getProfile,
-  /* updateSingleUser,
-  updateProfile, */
-  deleteSingleUser,
+  createUser,
+  loginUser,
+  refreshToken,
+  ownProfile,
   getAllUsers,
   getSingleUser,
-  totalUsers,
-  createCustomer,
-  createAdmin,
-  createTutor,
+  updateUser,
+  updateUserByAdmin,
+  changeRole,
+  changePassword,
 };

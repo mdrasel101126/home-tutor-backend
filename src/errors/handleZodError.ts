@@ -1,18 +1,22 @@
-import { ZodError, ZodIssue } from "zod";
-import { IGenericErrorResponse } from "../interfaces/common";
-import { IGenericErrorMessage } from "../interfaces/error";
+/* eslint-disable no-unused-expressions */
+import { ZodError, ZodIssue } from 'zod';
+import { IGenericErrorResponse } from '../interfaces/common';
+import { IGenericErrorMessages } from '../interfaces/error';
 
 const handleZodError = (error: ZodError): IGenericErrorResponse => {
-  const errors: IGenericErrorMessage[] = error.issues.map((issue: ZodIssue) => {
-    return {
-      path: issue?.path[issue.path.length - 1],
-      message: issue?.message,
-    };
-  });
   const statusCode = 400;
+  const errors: IGenericErrorMessages[] = error.issues.map(
+    (issue: ZodIssue) => {
+      return {
+        path: issue?.path[issue.path.length - 1],
+        message: issue?.message,
+      };
+    }
+  );
+
   return {
     statusCode,
-    message: "Validation Error",
+    message: 'Validation error',
     errorMessages: errors,
   };
 };

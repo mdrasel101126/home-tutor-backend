@@ -12,76 +12,85 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
-const mongoose_1 = require("mongoose");
-const config_1 = __importDefault(require("../../../config"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const UserSchema = new mongoose_1.Schema({
+const mongoose_1 = require("mongoose");
+const user_constant_1 = require("./user.constant");
+const config_1 = __importDefault(require("../../../config"));
+const userSchema = new mongoose_1.Schema({
+    fullName: {
+        type: String,
+        required: true,
+    },
     email: {
         type: String,
         required: true,
         unique: true,
     },
-    role: {
+    phoneNumber: {
         type: String,
+        required: true,
+        unique: true,
     },
     password: {
         type: String,
         required: true,
         select: false,
     },
-    profileImg: {
+    role: {
         type: String,
+        required: true,
+        enum: user_constant_1.userRoles,
+        default: 'user',
     },
-    admin: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Admin",
-    },
-    customer: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Customer",
-    },
-    tutor: {
-        type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Tutor",
+    history: [
+        {
+            tutorId: {
+                type: mongoose_1.Schema.Types.ObjectId,
+                ref: 'Tutor',
+                required: true,
+            },
+            teachingStartDate: {
+                type: Date,
+                required: true,
+            },
+            dayPerWeek: {
+                type: Number,
+                required: true,
+            },
+            maxSalary: {
+                type: Number,
+                required: true,
+            },
+            description: {
+                type: String,
+                required: true,
+            },
+        },
+    ],
+    unseenNotification: {
+        type: Number,
+        required: true,
+        default: 0,
     },
 }, {
     timestamps: true,
 });
-UserSchema.statics.isUserExist = function (id) {
+userSchema.statics.isUserExist = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield exports.User.findById(id).select("+password").lean();
+        return yield User.findOne({ email }, { phoneNumber: 1, password: 1, role: 1 });
     });
 };
-UserSchema.statics.isPasswordMatched = function (givenPassword, savedPassword) {
+userSchema.statics.isPasswordMatch = function (givenPassword, savePassword) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield bcrypt_1.default.compare(givenPassword, savedPassword);
+        return yield bcrypt_1.default.compare(givenPassword, savePassword);
     });
 };
-UserSchema.pre("save", function (next) {
+userSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {
-        // password hash
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const user = this;
-        user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_round));
+        // hashing password
+        this.password = yield bcrypt_1.default.hash(this.password, Number(config_1.default.jwt.bcrypt_salt_rounds));
         next();
     });
 });
-UserSchema.pre("findOneAndUpdate", function (next) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const update = this.getUpdate();
-        if (update === null || update === void 0 ? void 0 : update.password) {
-            update.password = yield bcrypt_1.default.hash(update.password, Number(config_1.default.bcrypt_salt_round));
-        }
-        next();
-    });
-});
-/* UserSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj.password;
-  delete obj.__v;
-  delete obj.createdAt;
-  delete obj.updatedAt;
-  return obj;
-}; */
-exports.User = (0, mongoose_1.model)("User", UserSchema);
+const User = (0, mongoose_1.model)('User', userSchema);
+exports.default = User;

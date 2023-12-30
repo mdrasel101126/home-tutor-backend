@@ -1,51 +1,108 @@
-import { Router } from "express";
-import validateRequest from "../../middlewares/validateRequest";
-import { UserValidation } from "./user.validation";
-import { UserController } from "./user.controller";
-import auth from "../../middlewares/auth";
-import { ENUM_USER_ROLE } from "../../../enums/user";
+import express from 'express';
+import { UserController } from './user.controller';
+import validateRequest from '../../middleware/validateRequest';
+import { UserValidation } from './user.validation';
+import auth from '../../middleware/auth';
+import { ENUM_USER_ROLE } from '../../../enums/user';
 
-const router = Router();
+const router = express.Router();
 
-/* router.post(
-  "/create-user",
+router.post(
+  '/signup',
   validateRequest(UserValidation.createUserZodSchema),
-  UserController.createUser
-); */
-router.post(
-  "/create-customer",
-  validateRequest(UserValidation.createCustomerZodSchema),
-  UserController.createCustomer
-);
-router.post(
-  "/create-admin",
-  validateRequest(UserValidation.createAdminZodSchema),
-  UserController.createAdmin
-);
-router.post(
-  "/create-tutor",
-  validateRequest(UserValidation.createTutorZodSchema),
-  UserController.createTutor
-);
-/* router.post(
-  "/login-user",
-  validateRequest(UserValidation.loginUserZodSchema),
-  UserController.loginUser
-); */
-router.get("/", UserController.getAllUsers);
-router.get("/users-count", UserController.totalUsers);
-router.get("/profile", auth(), UserController.getProfile);
-router.get("/:id", UserController.getSingleUser);
-//router.patch("/profile", auth(), UserController.updateProfile);
-/* router.patch(
-  "/:id",
-  auth(ENUM_USER_ROLE.SUPPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  UserController.updateSingleUser
-); */
-router.delete(
-  "/:id",
-  auth(ENUM_USER_ROLE.SUPPER_ADMIN, ENUM_USER_ROLE.ADMIN),
-  UserController.deleteSingleUser
+  UserController.createUser,
 );
 
-export const UserRoute = router;
+router.post(
+  '/login',
+  validateRequest(UserValidation.loginZodSchema),
+  UserController.loginUser,
+);
+
+router.post(
+  '/refresh-token',
+  validateRequest(UserValidation.refreshTokenZodSchema),
+  UserController.refreshToken,
+);
+
+router.get(
+  '/profile',
+  auth(
+    ENUM_USER_ROLE.USER,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.ADMIN_TUTOR,
+    ENUM_USER_ROLE.ADMIN_USER,
+    ENUM_USER_ROLE.SUPER_ADMIN,
+  ),
+  UserController.ownProfile,
+);
+
+router.get(
+  '/get-all-users',
+  auth(
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.ADMIN_USER,
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.ADMIN_TUTOR,
+  ),
+  UserController.getAllUsers,
+);
+
+router.get(
+  '/single-user/:id',
+  auth(
+    ENUM_USER_ROLE.USER,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.ADMIN_TUTOR,
+    ENUM_USER_ROLE.ADMIN_USER,
+    ENUM_USER_ROLE.SUPER_ADMIN,
+    ENUM_USER_ROLE.TUTOR,
+  ),
+  UserController.getSingleUser,
+);
+
+router.patch(
+  '/profile',
+  validateRequest(UserValidation.updateUserZodSchema),
+  auth(
+    ENUM_USER_ROLE.USER,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.ADMIN_TUTOR,
+    ENUM_USER_ROLE.ADMIN_USER,
+    ENUM_USER_ROLE.SUPER_ADMIN,
+  ),
+  UserController.updateUser,
+);
+
+router.patch(
+  '/profile/:id',
+  validateRequest(UserValidation.updateUserZodSchema),
+  auth(
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.ADMIN_USER,
+    ENUM_USER_ROLE.SUPER_ADMIN,
+  ),
+  UserController.updateUserByAdmin,
+);
+
+router.patch(
+  '/change-role/:id',
+  validateRequest(UserValidation.changeRoleZodSchema),
+  auth(ENUM_USER_ROLE.SUPER_ADMIN),
+  UserController.changeRole,
+);
+
+router.patch(
+  '/change-password',
+  auth(
+    ENUM_USER_ROLE.USER,
+    ENUM_USER_ROLE.ADMIN,
+    ENUM_USER_ROLE.ADMIN_TUTOR,
+    ENUM_USER_ROLE.ADMIN_USER,
+    ENUM_USER_ROLE.SUPER_ADMIN,
+  ),
+  validateRequest(UserValidation.changePasswordZodSchema),
+  UserController.changePassword,
+);
+
+export const UserRouters = router;

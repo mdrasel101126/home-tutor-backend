@@ -94,13 +94,13 @@ const getTutors = (filters, paginationOptions) => __awaiter(void 0, void 0, void
     };
 });
 const getSingleTutor = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const isBookExist = yield tutor_model_1.Tutor.isTutorExist(id);
-    if (!isBookExist) {
+    const isTutorExist = yield tutor_model_1.Tutor.isTutorExist(id);
+    if (!isTutorExist) {
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, "Tutor not found");
     }
     const reviws = yield review_model_1.Review.find({ tutor: id }).populate("user");
     return {
-        tutor: isBookExist,
+        tutor: isTutorExist,
         reviews: reviws,
     };
 });

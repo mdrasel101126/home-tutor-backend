@@ -1,24 +1,52 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Booking = void 0;
 const mongoose_1 = require("mongoose");
-const BookingSchema = new mongoose_1.Schema({
-    user: {
+const tutor_constant_1 = require("../tutor/tutor.constant");
+const bookingSchema = new mongoose_1.Schema({
+    userId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
+        required: true,
     },
-    tutor: {
+    tutorId: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Tutor",
+        ref: 'Tutor',
+        required: true,
+    },
+    status: {
+        type: String,
+        required: true,
+        enum: tutor_constant_1.statusInfo,
+        default: 'request',
+    },
+    teachingStartDate: {
+        type: Date,
+        required: true,
+    },
+    message: {
+        dayPerWeek: {
+            type: Number,
+            required: true,
+        },
+        teachingTime: {
+            type: String,
+            required: true,
+        },
+        maxSalary: {
+            type: Number,
+            required: true,
+        },
+        location: {
+            type: String,
+            required: true,
+        },
+        description: {
+            type: String,
+            required: true,
+        },
     },
 }, {
     timestamps: true,
 });
-/* ReviewSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj.__v;
-  delete obj.createdAt;
-  delete obj.updatedAt;
-  return obj;
-}; */
-exports.Booking = (0, mongoose_1.model)("Booking", BookingSchema);
+const Booking = (0, mongoose_1.model)('Booking', bookingSchema);
+exports.default = Booking;

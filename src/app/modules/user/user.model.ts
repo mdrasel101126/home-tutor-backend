@@ -1,84 +1,97 @@
-import { Schema, model } from "mongoose";
-import { IUser, UserModel } from "./user.interface";
-import config from "../../../config";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
+import { Schema, model } from 'mongoose';
+import { IUser, UserModel } from './user.interface';
+import { userRoles } from './user.constant';
+import config from '../../../config';
 
-const UserSchema = new Schema<IUser, UserModel>(
+const userSchema = new Schema<IUser>(
   {
+    fullName: {
+      type: String,
+      required: true,
+    },
     email: {
       type: String,
       required: true,
       unique: true,
     },
-    role: {
+    phoneNumber: {
       type: String,
+      required: true,
+      unique: true,
     },
     password: {
       type: String,
       required: true,
       select: false,
     },
-    profileImg: {
+    role: {
       type: String,
+      required: true,
+      enum: userRoles,
+      default: 'user',
     },
-    admin: {
-      type: Schema.Types.ObjectId,
-      ref: "Admin",
-    },
-    customer: {
-      type: Schema.Types.ObjectId,
-      ref: "Customer",
-    },
-    tutor: {
-      type: Schema.Types.ObjectId,
-      ref: "Tutor",
+    history: [
+      {
+        tutorId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Tutor',
+          required: true,
+        },
+        teachingStartDate: {
+          type: Date,
+          required: true,
+        },
+        dayPerWeek: {
+          type: Number,
+          required: true,
+        },
+        maxSalary: {
+          type: Number,
+          required: true,
+        },
+        description: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    unseenNotification: {
+      type: Number,
+      required: true,
+      default: 0,
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-UserSchema.statics.isUserExist = async function (
-  id: string
-): Promise<IUser | null> {
-  return await User.findById(id).select("+password").lean();
+userSchema.statics.isUserExist = async function (
+  email: string,
+): Promise<Pick<IUser, 'id' | 'email' | 'password' | 'role'> | null> {
+  return await User.findOne(
+    { email },
+    { phoneNumber: 1, password: 1, role: 1 },
+  );
 };
 
-UserSchema.statics.isPasswordMatched = async function (
+userSchema.statics.isPasswordMatch = async function (
   givenPassword: string,
-  savedPassword: string
+  savePassword: string,
 ): Promise<boolean> {
-  return await bcrypt.compare(givenPassword, savedPassword);
+  return await bcrypt.compare(givenPassword, savePassword);
 };
 
-UserSchema.pre("save", async function (next) {
-  // password hash
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round)
+userSchema.pre('save', async function (next) {
+  // hashing password
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.jwt.bcrypt_salt_rounds),
   );
   next();
 });
-UserSchema.pre("findOneAndUpdate", async function (next) {
-  const update = this.getUpdate() as Partial<IUser>;
-  if (update?.password) {
-    update.password = await bcrypt.hash(
-      update.password,
-      Number(config.bcrypt_salt_round)
-    );
-  }
-  next();
-});
-/* UserSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj.password;
-  delete obj.__v;
-  delete obj.createdAt;
-  delete obj.updatedAt;
-  return obj;
-}; */
 
-export const User = model<IUser, UserModel>("User", UserSchema);
+const User = model<IUser, UserModel>('User', userSchema);
+
+export default User;

@@ -1,36 +1,44 @@
-/* eslint-disable no-unused-vars */
-import mongoose, { Model, Types } from "mongoose";
-import { ICusomer } from "../customer/customer.interface";
-import { ITutor } from "../tutor/tutor.interface";
-import { IAdmin } from "../admin/admin.interface";
-export type IUserRole = "customer" | "admin" | "super_admin" | "tutor";
+import { Model, Types } from 'mongoose';
+import { Role } from './user.constant';
 
 export type IUser = {
-  _id: Types.ObjectId | null;
+  id: string;
+  fullName: string;
   email: string;
+  phoneNumber: string;
   password: string;
-  role?: string;
-  profileImg?: string;
-  customer?: Types.ObjectId | ICusomer;
-  tutor?: Types.ObjectId | ITutor;
-  admin?: Types.ObjectId | IAdmin;
+  role: Role;
+  history?: Array<{
+    tutorId: Types.ObjectId;
+    teachingStartDate: Date;
+    dayPerWeek: number;
+    maxSalary: number;
+    description: string;
+  }>;
+  unseenNotification: number;
 };
 
 export type UserModel = {
-  isUserExist(id: string): Promise<IUser>;
-  isPasswordMatched(
+  isUserExist(
+    email: string,
+  ): Promise<Pick<IUser, 'id' | 'email' | 'password' | 'role'>>;
+  isPasswordMatch(
     givenPassword: string,
-    savedPassword: string
+    savePassword: string,
   ): Promise<boolean>;
 } & Model<IUser>;
 
-export type IUserCreateResponse = {
-  newUserData?: mongoose.Document<unknown, Record<string, never>, IUser> | null;
+export type ILoginUserResponse = {
   accessToken: string;
+  refreshToken?: string;
 };
-export type IAdminCreateResponse = {
-  newUserData?: mongoose.Document<unknown, Record<string, never>, IUser> | null;
+
+export type ILoginRequest = {
+  email: string;
+  password: string;
 };
-export type IUserLoginResponse = {
-  accessToken: string;
+
+export type IChangePassword = {
+  oldPassword: string;
+  newPassword: string;
 };

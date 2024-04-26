@@ -1,36 +1,40 @@
-import express, { Application, Request, Response, NextFunction } from "express";
-import cors from "cors";
-import globalErrorHandler from "./app/middlewares/globalErrorHandler";
-import Routes from "./app/routes";
-import httpStatus from "http-status";
-import cookieParser from "cookie-parser";
+import express, { Application, Request, Response } from 'express';
+import cors from 'cors';
+import globalErrorHandler from './app/middleware/globalErrorHandler';
+import { ApplicationRouters } from './app/routes';
+import cookieParser from 'cookie-parser';
 
 const app: Application = express();
+
 app.use(cors());
+app.use(cookieParser());
 
-//parser
-
+// parser
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-//application routes
-app.use("/api/v1/", Routes);
 
-//global error handler
-app.use(globalErrorHandler);
-app.use((req: Request, res: Response, next: NextFunction) => {
-  res.status(httpStatus.NOT_FOUND).json({
-    statusCode: httpStatus.NOT_FOUND,
-    success: false,
-    message: "Not Found",
-    errorMessages: [
-      {
-        path: req.originalUrl,
-        message: "API Not Found",
-      },
-    ],
+// Testing
+app.get('/', (req: Request, res: Response) => {
+  return res.status(200).json({
+    success: true,
+    message: 'Welcome to Tutoring service.',
   });
-  next();
+});
+
+app.use('/api/v1', ApplicationRouters);
+
+app.use(globalErrorHandler);
+
+// No routes
+app.use((req: Request, res: Response) => {
+  return res.status(404).json({
+    success: false,
+    message: 'Not found.',
+    errorMessage: {
+      path: req.originalUrl,
+      message: 'Api not found!!! Wrong url, there is no route in this url.',
+    },
+  });
 });
 
 export default app;

@@ -1,89 +1,234 @@
-import { Schema, model } from "mongoose";
-import { ITutor, TutorModel } from "./tutor.interface";
+import bcrypt from 'bcrypt';
+import { Schema, model } from 'mongoose';
+import config from '../../../config';
+import { ITutor, TutorModel } from './tutor.interface';
+import {
+  statusInfo,
+  tutorCurrentStatus,
+  tutorGender,
+  tutorGroup,
+  tutorMedium,
+  tutorPreferredClass,
+} from './tutor.constant';
 
-const TutorSchema = new Schema<ITutor, TutorModel>(
+const tutorSchema = new Schema<ITutor>(
   {
-    name: {
-      firstName: {
-        type: String,
-        required: true,
-      },
-      lastName: {
-        type: String,
-        required: true,
-      },
+    fullName: {
+      type: String,
+      required: true,
     },
     email: {
       type: String,
       required: true,
+      unique: true,
     },
-    isAvailable: {
-      type: Boolean,
-      default: true,
-    },
-    contactNo: {
+    phoneNumber: {
       type: String,
       required: true,
+      unique: true,
     },
-    division: {
+    password: {
       type: String,
       required: true,
+      select: false,
     },
-    district: {
+    imgUrl: {
       type: String,
-      required: true,
     },
-    policeStation: {
-      type: String,
-      required: true,
-    },
-    tutionArea: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
     role: {
       type: String,
-      default: "tutor",
+      required: true,
+      default: 'tutor',
     },
-    sallaryRange: {
+    gender: {
+      type: String,
+      enum: tutorGender,
+      required: true,
+    },
+    qualification: {
       type: String,
       required: true,
     },
-    description: {
+    institution: {
       type: String,
       required: true,
     },
-    educationQualification: {
+    group: {
+      type: String,
+      enum: tutorGroup,
+      required: true,
+    },
+    subject: {
       type: String,
       required: true,
     },
-    institutionName: {
+    medium: {
+      type: String,
+      enum: tutorMedium,
+      required: true,
+    },
+    presentAddress: {
       type: String,
       required: true,
     },
-    preferedClasses: [
+    expertIn: {
+      type: [String],
+      required: true,
+    },
+    currentStatus: {
+      type: String,
+      enum: tutorCurrentStatus,
+      required: true,
+      default: 'available',
+    },
+    expectedMinSalary: {
+      type: Number,
+      required: true,
+    },
+    dayPerWeek: {
+      type: Number,
+      required: true,
+    },
+    preferredClass: {
+      type: String,
+      enum: tutorPreferredClass,
+      required: true,
+      default: '1-12',
+    },
+    preferredArea: {
+      type: String,
+      required: true,
+    },
+    preferredSubject: {
+      type: String,
+      required: true,
+    },
+    preferredMedium: {
+      type: String,
+      enum: tutorMedium,
+      required: true,
+    },
+    notification: [
       {
-        type: String,
-        required: true,
+        tutorId: {
+          type: Schema.Types.ObjectId,
+          ref: 'Tutor',
+          required: true,
+        },
+        userId: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        status: {
+          type: String,
+          required: true,
+          enum: statusInfo,
+        },
+        teachingStartDate: {
+          type: Date,
+          required: true,
+        },
+        message: {
+          dayPerWeek: {
+            type: Number,
+            required: true,
+          },
+          teachingTime: {
+            type: String,
+            required: true,
+          },
+          maxSalary: {
+            type: Number,
+            required: true,
+          },
+          location: {
+            type: String,
+            required: true,
+          },
+          description: {
+            type: String,
+            required: true,
+          },
+        },
       },
     ],
-    preferedSubjects: [
+    history: [
       {
-        type: String,
-        required: true,
+        userId: {
+          type: Schema.Types.ObjectId,
+          required: true,
+        },
+        dayPerWeek: {
+          type: Number,
+          required: true,
+        },
+        maxSalary: {
+          type: Number,
+          required: true,
+        },
+        location: {
+          type: String,
+          required: true,
+        },
+        description: {
+          type: String,
+          required: true,
+        },
+        teachingStartDate: {
+          type: Date,
+          required: true,
+        },
       },
     ],
+<<<<<<< HEAD
     profileImg: {
       type: String,
+=======
+    reviews: [
+      {
+        name: {
+          type: String,
+          required: true,
+        },
+        review: {
+          type: String,
+          required: true,
+        },
+        rating: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
+    totalTuitionTaken: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    currentTuition: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    maximumTuitionCapacity: {
+      type: Number,
+      required: true,
+      default: 5,
+    },
+    unseenNotification: {
+      type: Number,
+      required: true,
+      default: 0,
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
+<<<<<<< HEAD
 TutorSchema.statics.isTutorExist = async function (
   id: string
 ): Promise<ITutor | null> {
@@ -92,39 +237,33 @@ TutorSchema.statics.isTutorExist = async function (
 
 /*
 TutorSchema.statics.isPasswordMatched = async function (
-  givenPassword: string,
-  savedPassword: string
-): Promise<boolean> {
-  return await bcrypt.compare(givenPassword, savedPassword);
+=======
+tutorSchema.statics.isUserExist = async function (
+  email: string,
+): Promise<Pick<ITutor, 'id' | 'email' | 'password' | 'role'> | null> {
+  return await Tutor.findOne(
+    { email },
+    { phoneNumber: 1, password: 1, role: 1 },
+  );
 };
 
-TutorSchema.pre("save", async function (next) {
-  // password hash
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round)
+tutorSchema.statics.isPasswordMatch = async function (
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
+  givenPassword: string,
+  savePassword: string,
+): Promise<boolean> {
+  return await bcrypt.compare(givenPassword, savePassword);
+};
+
+tutorSchema.pre('save', async function (next) {
+  // hashing password
+  this.password = await bcrypt.hash(
+    this.password,
+    Number(config.jwt.bcrypt_salt_rounds),
   );
   next();
 });
-TutorSchema.pre("findOneAndUpdate", async function (next) {
-  const update = this.getUpdate() as Partial<ITutor>;
-  if (update?.password) {
-    update.password = await bcrypt.hash(
-      update.password,
-      Number(config.bcrypt_salt_round)
-    );
-  }
-  next();
-}); */
-/* UserSchema.methods.toJSON = function () {
-  const obj = this.toObject();
-  delete obj.password;
-  delete obj.__v;
-  delete obj.createdAt;
-  delete obj.updatedAt;
-  return obj;
-}; */
 
-export const Tutor = model<ITutor, TutorModel>("Tutor", TutorSchema);
+const Tutor = model<ITutor, TutorModel>('Tutor', tutorSchema);
+
+export default Tutor;

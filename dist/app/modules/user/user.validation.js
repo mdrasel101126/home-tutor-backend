@@ -2,17 +2,58 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserValidation = void 0;
 const zod_1 = require("zod");
-const user_constants_1 = require("./user.constants");
-const loginUserZodSchema = zod_1.z.object({
-    body: zod_1.z.object({
-        email: zod_1.z.string({
-            required_error: "Email is required",
+const user_constant_1 = require("./user.constant");
+const createUserZodSchema = zod_1.z.object({
+    body: zod_1.z
+        .object({
+        fullName: zod_1.z.string({
+            required_error: 'fullName is required',
+        }),
+        email: zod_1.z
+            .string({
+            required_error: 'email is required',
+        })
+            .email({ message: 'Invalid email format' }),
+        phoneNumber: zod_1.z.string({
+            required_error: 'phoneNumber is required',
         }),
         password: zod_1.z.string({
-            required_error: "Passsword is required",
+            required_error: 'password is required',
+        }),
+    })
+        .strict(),
+});
+const updateUserZodSchema = zod_1.z.object({
+    body: zod_1.z
+        .object({
+        fullName: zod_1.z.string().optional(),
+        phoneNumber: zod_1.z.string().optional(),
+    })
+        .strict(),
+});
+const changePasswordZodSchema = zod_1.z.object({
+    body: zod_1.z
+        .object({
+        oldPassword: zod_1.z.string({
+            required_error: 'Old password is required',
+        }),
+        newPassword: zod_1.z.string({
+            required_error: 'New password is required',
+        }),
+    })
+        .strict(),
+});
+const loginZodSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        email: zod_1.z.string({
+            required_error: 'Email is required',
+        }),
+        password: zod_1.z.string({
+            required_error: 'Password is required',
         }),
     }),
 });
+<<<<<<< HEAD
 const createCustomerZodSchema = zod_1.z.object({
     body: zod_1.z.object({
         email: zod_1.z.string({
@@ -52,14 +93,22 @@ const createCustomerZodSchema = zod_1.z.object({
             profileImg: zod_1.z.string().optional(),
         }, {
             required_error: "Customer is Reequired",
+=======
+const refreshTokenZodSchema = zod_1.z.object({
+    cookies: zod_1.z.object({
+        refreshToken: zod_1.z.string({
+            required_error: 'Refresh Token is required',
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
         }),
     }),
 });
-const createAdminZodSchema = zod_1.z.object({
-    body: zod_1.z.object({
-        email: zod_1.z.string({
-            required_error: "Email is required",
+const changeRoleZodSchema = zod_1.z.object({
+    body: zod_1.z
+        .object({
+        role: zod_1.z.enum([...user_constant_1.userRoles], {
+            required_error: 'role is required',
         }),
+<<<<<<< HEAD
         role: zod_1.z.enum([...user_constants_1.userRole]).optional(),
         password: zod_1.z.string({
             required_error: "Passsword is required",
@@ -160,10 +209,16 @@ const createTutorZodSchema = zod_1.z.object({
             required_error: "Tutor is required",
         }),
     }),
+=======
+    })
+        .strict(),
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
 });
 exports.UserValidation = {
-    loginUserZodSchema,
-    createCustomerZodSchema,
-    createAdminZodSchema,
-    createTutorZodSchema,
+    createUserZodSchema,
+    updateUserZodSchema,
+    loginZodSchema,
+    refreshTokenZodSchema,
+    changePasswordZodSchema,
+    changeRoleZodSchema,
 };

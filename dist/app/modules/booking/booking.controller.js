@@ -13,41 +13,94 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingController = void 0;
+const booking_service_1 = require("./booking.service");
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
-const booking_service_1 = require("./booking.service");
 const http_status_1 = __importDefault(require("http-status"));
-const createBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield booking_service_1.BookingService.createBooking(req.body);
-    return (0, sendResponse_1.default)(res, {
+const bookTutor = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const bookingData = req.body;
+    const result = yield booking_service_1.BookingService.bookTutor(bookingData, user);
+    (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Booking added successfully",
         data: result,
+        message: 'Tutor booked Successfully',
     });
 }));
-const getUserBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const result = yield booking_service_1.BookingService.getUserBookings((_a = req.user) === null || _a === void 0 ? void 0 : _a._id);
-    return (0, sendResponse_1.default)(res, {
+const getAllBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield booking_service_1.BookingService.getAllBookings();
+    (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Bookings retrived successfully",
         data: result,
+        message: 'Bookings retrieved Successfully.',
     });
 }));
-const deleteBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _b;
-    const result = yield booking_service_1.BookingService.deleteBooking((_b = req.params) === null || _b === void 0 ? void 0 : _b.id);
-    return (0, sendResponse_1.default)(res, {
+const getAllRequestedBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield booking_service_1.BookingService.getAllRequestedBookings();
+    (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: "Booking deleted successfully",
         data: result,
+        message: 'All Requested Bookings retrieved Successfully.',
+    });
+}));
+const getOwnBookings = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    const result = yield booking_service_1.BookingService.getOwnBookings(user);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        data: result,
+        message: 'Bookings retrieved Successfully.',
+    });
+}));
+const processBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.bookingId;
+    const result = yield booking_service_1.BookingService.processBooking(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result,
+    });
+}));
+const cancelBookingByAdmin = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.bookingId;
+    const result = yield booking_service_1.BookingService.cancelBookingByAdmin(id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result,
+    });
+}));
+const cancelBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.bookingId;
+    const userInfo = req.user;
+    const result = yield booking_service_1.BookingService.cancelBooking(id, userInfo);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result,
+    });
+}));
+const confirmBooking = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.bookingId;
+    const userInfo = req.user;
+    const result = yield booking_service_1.BookingService.confirmBooking(id, userInfo);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: result,
     });
 }));
 exports.BookingController = {
-    createBooking,
-    getUserBookings,
-    deleteBooking,
+    bookTutor,
+    getAllBookings,
+    processBooking,
+    cancelBookingByAdmin,
+    getOwnBookings,
+    cancelBooking,
+    confirmBooking,
+    getAllRequestedBookings,
 };

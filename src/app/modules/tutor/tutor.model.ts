@@ -75,18 +75,22 @@ const TutorSchema = new Schema<ITutor, TutorModel>(
         required: true,
       },
     ],
+    profileImg: {
+      type: String,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-/* TutorSchema.statics.isTutorExist = async function (
+TutorSchema.statics.isTutorExist = async function (
   id: string
 ): Promise<ITutor | null> {
-  return await Tutor.findById(id).select("+password").lean();
+  return await Tutor.findById(id).lean();
 };
 
+/*
 TutorSchema.statics.isPasswordMatched = async function (
   givenPassword: string,
   savedPassword: string

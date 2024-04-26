@@ -34,6 +34,9 @@ const AdminSchema = new Schema<IAdmin, AdminModel>(
       type: String,
       required: true,
     },
+    profileImg: {
+      type: String,
+    },
   },
   {
     timestamps: true,

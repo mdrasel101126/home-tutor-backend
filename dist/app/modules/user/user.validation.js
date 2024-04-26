@@ -49,6 +49,7 @@ const createCustomerZodSchema = zod_1.z.object({
             contactNo: zod_1.z.string({
                 required_error: "Contact No is required",
             }),
+            profileImg: zod_1.z.string().optional(),
         }, {
             required_error: "Customer is Reequired",
         }),
@@ -90,8 +91,9 @@ const createAdminZodSchema = zod_1.z.object({
             contactNo: zod_1.z.string({
                 required_error: "Contact No is required",
             }),
+            profileImg: zod_1.z.string().optional(),
         }, {
-            required_error: "Customer is Reequired",
+            required_error: "Admin is Reequired",
         }),
     }),
 });
@@ -153,6 +155,9 @@ const createTutorZodSchema = zod_1.z.object({
             preferedSubjects: zod_1.z.array(zod_1.z.string({
                 required_error: "Tution area is required",
             })),
+            profileImg: zod_1.z.string().optional(),
+        }, {
+            required_error: "Tutor is required",
         }),
     }),
 });

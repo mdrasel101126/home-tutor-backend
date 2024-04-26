@@ -15,12 +15,41 @@ const createReview = async (payload: IReview): Promise<IReview> => {
   if (!isUserExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "User is not found!");
   }
-  const result = await Review.create(payload);
+  const result = (await Review.create(payload)).populate({
+    path: "user",
+    populate: [
+      {
+        path: "tutor",
+      },
+      {
+        path: "customer",
+      },
+      {
+        path: "admin",
+      },
+    ],
+  });
   return result;
 };
 
 const getUserReviews = async (id: string): Promise<IReview[]> => {
-  const result = await Review.find({ user: id });
+  const result = await Review.find({ user: id }).populate({
+    path: "user",
+    populate: [
+      {
+        path: "tutor",
+        model: "Tutor",
+      },
+      {
+        path: "customer",
+        model: "Customer",
+      },
+      {
+        path: "admin",
+        model: "Admin",
+      },
+    ],
+  });
   return result;
 };
 

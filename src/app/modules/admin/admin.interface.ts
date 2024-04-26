@@ -12,6 +12,7 @@ export type IAdmin = {
   division: string;
   district: string;
   policeStation: string;
+  profileImg?: string;
 };
 
 export type AdminModel = {

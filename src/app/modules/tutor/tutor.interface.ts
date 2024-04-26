@@ -24,6 +24,7 @@ export type ITutor = {
   institutionName: string;
   preferedClasses: string[];
   preferedSubjects: string[];
+  profileImg?: string;
 };
 
 export type TutorModel = {

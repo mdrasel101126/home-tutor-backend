@@ -11,6 +11,7 @@ export type ICusomer = {
   division: string;
   district: string;
   policeStation: string;
+  profileImg?: string;
 };
 
 /* export type CusomerModel = {

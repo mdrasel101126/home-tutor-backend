@@ -105,14 +105,14 @@ const getTutors = async (
 };
 
 const getSingleTutor = async (id: string): Promise<ISingleTutorResponse> => {
-  const isBookExist = await Tutor.isTutorExist(id);
-  if (!isBookExist) {
+  const isTutorExist = await Tutor.isTutorExist(id);
+  if (!isTutorExist) {
     throw new ApiError(httpStatus.NOT_FOUND, "Tutor not found");
   }
   const reviws = await Review.find({ tutor: id }).populate("user");
 
   return {
-    tutor: isBookExist,
+    tutor: isTutorExist,
     reviews: reviws,
   };
 };

@@ -33,6 +33,9 @@ const CusomerSchema = new Schema<ICusomer>(
       type: String,
       required: true,
     },
+    profileImg: {
+      type: String,
+    },
   },
   {
     timestamps: true,

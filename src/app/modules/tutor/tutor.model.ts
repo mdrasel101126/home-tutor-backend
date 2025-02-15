@@ -181,6 +181,10 @@ const tutorSchema = new Schema<ITutor>(
         },
       },
     ],
+<<<<<<< HEAD
+    profileImg: {
+      type: String,
+=======
     reviews: [
       {
         name: {
@@ -216,6 +220,7 @@ const tutorSchema = new Schema<ITutor>(
       type: Number,
       required: true,
       default: 0,
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
     },
   },
   {
@@ -223,6 +228,16 @@ const tutorSchema = new Schema<ITutor>(
   },
 );
 
+<<<<<<< HEAD
+TutorSchema.statics.isTutorExist = async function (
+  id: string
+): Promise<ITutor | null> {
+  return await Tutor.findById(id).lean();
+};
+
+/*
+TutorSchema.statics.isPasswordMatched = async function (
+=======
 tutorSchema.statics.isUserExist = async function (
   email: string,
 ): Promise<Pick<ITutor, 'id' | 'email' | 'password' | 'role'> | null> {
@@ -233,6 +248,7 @@ tutorSchema.statics.isUserExist = async function (
 };
 
 tutorSchema.statics.isPasswordMatch = async function (
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
   givenPassword: string,
   savePassword: string,
 ): Promise<boolean> {

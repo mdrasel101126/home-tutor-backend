@@ -8,9 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+<<<<<<< HEAD
+=======
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const mongoose_1 = require("mongoose");
@@ -185,6 +188,10 @@ const tutorSchema = new mongoose_1.Schema({
             },
         },
     ],
+<<<<<<< HEAD
+    profileImg: {
+        type: String,
+=======
     reviews: [
         {
             name: {
@@ -220,10 +227,24 @@ const tutorSchema = new mongoose_1.Schema({
         type: Number,
         required: true,
         default: 0,
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
     },
 }, {
     timestamps: true,
 });
+<<<<<<< HEAD
+TutorSchema.statics.isTutorExist = function (id) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield exports.Tutor.findById(id).lean();
+    });
+};
+/*
+TutorSchema.statics.isPasswordMatched = async function (
+  givenPassword: string,
+  savedPassword: string
+): Promise<boolean> {
+  return await bcrypt.compare(givenPassword, savedPassword);
+=======
 tutorSchema.statics.isUserExist = function (email) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield Tutor.findOne({ email }, { phoneNumber: 1, password: 1, role: 1 });
@@ -233,6 +254,7 @@ tutorSchema.statics.isPasswordMatch = function (givenPassword, savePassword) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield bcrypt_1.default.compare(givenPassword, savePassword);
     });
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
 };
 tutorSchema.pre('save', function (next) {
     return __awaiter(this, void 0, void 0, function* () {

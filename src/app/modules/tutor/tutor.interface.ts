@@ -14,6 +14,22 @@ export type ITutor = {
   email: string;
   phoneNumber: string;
   password: string;
+<<<<<<< HEAD
+  isAvailable?: boolean;
+  contactNo: string;
+  division: string;
+  district: string;
+  policeStation: string;
+  role?: string;
+  tutionArea: string[];
+  sallaryRange: string;
+  description: string;
+  educationQualification: string;
+  institutionName: string;
+  preferedClasses: string[];
+  preferedSubjects: string[];
+  profileImg?: string;
+=======
   imgUrl: string;
   role: 'tutor';
   gender: Gender;
@@ -57,6 +73,7 @@ export type ITutor = {
   currentTuition: number;
   maximumTuitionCapacity: number;
   unseenNotification: number;
+>>>>>>> 3ed703440065482e8dcc4c18cd46ffab1b180ede
 };
 
 export type TutorModel = {
